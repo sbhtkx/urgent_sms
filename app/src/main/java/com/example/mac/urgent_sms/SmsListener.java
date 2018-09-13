@@ -5,5 +5,5 @@ package com.example.mac.urgent_sms;
  */
 
 public interface SmsListener {
-    public void messageReceived(String messageText);
+    public void messageReceived(String messageText, String sender);
 }
