@@ -42,11 +42,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(auth.getCurrentUser()!=null){
             //user already signed in
             Log.d("AUTH",auth.getCurrentUser().getEmail());
-            Toast.makeText(this,"user!=null",Toast.LENGTH_LONG).show();
             startActivity(intent_registered);
         }
         else {
-            Toast.makeText(this,"else",Toast.LENGTH_LONG).show();
             startActivityForResult(AuthUI.getInstance()
                     .createSignInIntentBuilder().setProviders(
                             AuthUI.FACEBOOK_PROVIDER,
@@ -73,8 +71,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             else{
                 //user not authenticated
-                Toast.makeText(this,"result not ok",Toast.LENGTH_LONG).show();
-
                 Log.d("AUTH","NOT AUTHENTICATED");
             }
         }
