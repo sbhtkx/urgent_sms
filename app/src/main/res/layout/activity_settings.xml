@@ -30,4 +30,26 @@
         android:layout_marginTop="35dp"
          />
 
+    <Button
+        android:id="@+id/setContacts_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/msg_txt"
+        android:layout_alignBottom="@+id/msg_txt"
+        android:layout_alignLeft="@+id/msg_txt"
+        android:layout_alignStart="@+id/msg_txt"
+        android:textAllCaps="false"
+        android:text="Set urgent contacts" />
+
+    <Button
+        android:id="@+id/setWords_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/setContacts_btn"
+        android:layout_marginTop="21dp"
+        android:layout_toEndOf="@+id/msg_txt"
+        android:layout_toRightOf="@+id/msg_txt"
+        android:textAllCaps="false"
+        android:text="Set urget words" />
+
 </RelativeLayout>

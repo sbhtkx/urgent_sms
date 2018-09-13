@@ -21,9 +21,6 @@ public class MsgClassifier {
     private float b2;
     private double threshold;
 
-    String yaelp = "yael";
-    private String s = "daniel 1311";
-
     public MsgClassifier(WordsManager wm, AssetManager am){
         this.wm = wm;
         this.am = am;
