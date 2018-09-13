@@ -6,7 +6,7 @@ package com.example.mac.urgent_sms;
 
 public class yael {
 
-    String name = "yael";
+    String name = "daniel";
     public yael(String name){
         this.name = name;
     }
