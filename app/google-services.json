@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "261407728416",
+    "firebase_url": "https://urgent-sms.firebaseio.com",
+    "project_id": "urgent-sms",
+    "storage_bucket": "urgent-sms.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261407728416:android:f16894f79cf25368",
+        "android_client_info": {
+          "package_name": "com.example.mac.urgent_sms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "261407728416-g1eom1gl1ejua99h1mfe89rt20sc73nr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mac.urgent_sms",
+            "certificate_hash": "42e08ed90fe047c6ceb07162da5d7a697d921043"
+          }
+        },
+        {
+          "client_id": "261407728416-lenbl7rqaaujamkoikfppsmn4f2d8l79.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5Ha058NBu1OuSb1ptY-HiE_Mcj1az6Wo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "261407728416-lenbl7rqaaujamkoikfppsmn4f2d8l79.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
