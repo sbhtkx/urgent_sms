@@ -25,13 +25,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final int RC_SIGN_IN = 0;
     private FirebaseAuth auth;
-    Intent intent_registered=new Intent("com.example.mac.urgent_sms.RegisteredActivity");
+    private MyDatabase my_database = MyFirebaseDatabase.getInstance();
+    Intent intent_registered;
+    Intent settings_intent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-
+        intent_registered = new Intent("com.example.mac.urgent_sms.RegisteredActivity");
+        settings_intent = new Intent(this,SettingsActivity.class);
 
         WordsManager wm;
         try {
@@ -46,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
 
-        setContentView(R.layout.activity_main);
         auth = FirebaseAuth.getInstance();
         if(auth.getCurrentUser()!=null){
             //user already signed in
@@ -59,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             AuthUI.FACEBOOK_PROVIDER,
                             AuthUI.GOOGLE_PROVIDER).setLogo(R.drawable.main_page)
                     .build(), RC_SIGN_IN);
-            Toast.makeText(this,"returned to else stmt",Toast.LENGTH_LONG).show();
         }
 
 
@@ -72,8 +75,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(resultCode == RESULT_OK){
                 //user logged in
                 Toast.makeText(this,"result ok",Toast.LENGTH_LONG).show();
-
                 Log.d("AUTH",auth.getCurrentUser().getEmail());
+                my_database.setSwitchState(false);
                 Toast.makeText(this,"logged in",Toast.LENGTH_LONG).show();
                 startActivity(intent_registered);
 
@@ -84,8 +87,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
-
-
 
 
 

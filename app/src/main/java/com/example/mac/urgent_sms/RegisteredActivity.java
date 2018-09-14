@@ -78,7 +78,7 @@ public class RegisteredActivity extends AppCompatActivity implements View.OnClic
                 break;
 
             case (R.id.settings_btn):
-                Intent settings_intent = new Intent("com.example.mac.urgent_sms.SettingsActivity");
+                Intent settings_intent = new Intent("com.example.mac.urgent_sms.SettingsActivity2");
                 startActivity(settings_intent);
                 break;
 
