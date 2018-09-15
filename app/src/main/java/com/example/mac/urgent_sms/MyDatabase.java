@@ -10,5 +10,7 @@ public interface MyDatabase {
     public String getUserId();
     public void setSwitchState(boolean state);
     public void getSwitchState(MyCallback<String> callback);
+    public String getName();
+    public void setName();
 
 }

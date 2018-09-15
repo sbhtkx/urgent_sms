@@ -29,9 +29,23 @@ public class MyFirebaseDatabase implements MyDatabase {
     }
 
 
+
+    @Override
+    public void setName() {
+        String name = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        database.child("users").child(uid).child("name").setValue(name);
+    }
+
+
     @Override
     public String getUserId() {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
+    @Override
+    public String getName() {
+        return FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
     }
 
     @Override
