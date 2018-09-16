@@ -1,5 +1,7 @@
 package com.example.mac.urgent_sms;
 
+import java.util.ArrayList;
+
 /**
  * Created by Mac on 14/09/2018.
  */
@@ -12,5 +14,7 @@ public interface MyDatabase {
     public void getSwitchState(MyCallback<String> callback);
     public String getName();
     public void setName();
+    public void setContactList(ArrayList<Contact> contacts);
+    public void getContactList(MyCallback<ArrayList<Contact>> callback);
 
 }
