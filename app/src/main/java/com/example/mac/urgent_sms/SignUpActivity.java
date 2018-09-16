@@ -88,7 +88,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 //                AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
 //                    @Override
 //                    public void onComplete(@NonNull Task<Void> task) {
-//                        Log.d("AUTH","USER LOGGED OUT!");
+//                        Log.add_contact("AUTH","USER LOGGED OUT!");
 //                        finish();
 //                    }
 //                });

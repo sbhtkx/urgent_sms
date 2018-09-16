@@ -6,7 +6,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 /**
  * Created by Mac on 14/09/2018.
@@ -20,6 +23,7 @@ public class MyFirebaseDatabase implements MyDatabase {
     private MyFirebaseDatabase(){
         database = FirebaseDatabase.getInstance().getReference();
     }
+
 
     public static MyFirebaseDatabase getInstance(){
         if(instance == null){
@@ -66,5 +70,34 @@ public class MyFirebaseDatabase implements MyDatabase {
 
             }
         });
+    }
+
+
+    @Override
+    public void setContactList(ArrayList<Contact> contacts) {
+        database.child("users").child(getUserId()).child("urgent contacts").setValue(contacts);
+    }
+
+    @Override
+    public void getContactList(final MyCallback<ArrayList<Contact>> callback) {
+        database.child("users").child(getUserId()).child("urgent contacts").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<ArrayList<Contact>> t = new GenericTypeIndicator<ArrayList<Contact>>() {};
+                if(dataSnapshot.getValue() == null){
+                    callback.onSuccess(new ArrayList<Contact>());
+                }
+                else{
+                    callback.onSuccess(dataSnapshot.getValue(t));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
     }
 }

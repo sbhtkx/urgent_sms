@@ -3,6 +3,7 @@ package com.example.mac.urgent_sms;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -21,6 +22,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 import android.widget.Toolbar;
 
 import com.firebase.ui.auth.AuthUI;
@@ -28,9 +30,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView welcome;
-    private Switch enable_switch;
+    private ToggleButton enable_switch;
     private Button logout_btn;
     private Button settings;
     final static int SMS_PERMISSION_CODE = 1;
@@ -42,14 +46,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //set settings toolbar
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.setting_bar);
         setSupportActionBar(toolbar);
 
+        //default settings
         PreferenceManager.setDefaultValues(this,R.xml.preferences,false);
 
         auth = FirebaseAuth.getInstance();
         welcome = (TextView) findViewById(R.id.welcome_txt);
-        enable_switch = (Switch) findViewById(R.id.switch_enable_app);
+        enable_switch = (ToggleButton) findViewById(R.id.switch_enable_app);
         welcome.setText("Hello                                                                                " +my_database.getName()+",");
         logout_btn= (Button) findViewById(R.id.logout_btn);
         settings = (Button) findViewById(R.id.settings_btn);
@@ -57,24 +64,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         welcome.setOnClickListener(this);
         settings.setOnClickListener(this);
 
-        //ask for read sms permission
-        if(ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED){
-            requestSMSPermission();
-        }
-
         enable_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             public void onCheckedChanged(CompoundButton button, boolean isChecked){
                 if(isChecked){
-                    my_database.setSwitchState(true);
-                    SmsReceiver.bindListener(new SmsListener() {
-                        @Override
-                        public void messageReceived(String messageText, String sender) {
+                    //checks for permission
+                    if(ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED){
+                        enable_switch.setChecked(false);
+                        requestSMSPermission();
+                    }
+                    else{ //permission granted
+                        enable_switch.setChecked(true);
+                        my_database.setSwitchState(true);
+                        SmsReceiver.bindListener(new SmsListener() {
+                            @Override
+                            public void messageReceived(String messageText, String sender) {
 
-                            //msg_text.setText(messageText);
-                            //sender_txt.setText(sender);
+                                //msg_text.setText(messageText);
+                                //sender_txt.setText(sender);
 
-                        }
-                    });
+                            }
+                        });
+                    }
+
                 }
                 else{
                     my_database.setSwitchState(false);
@@ -93,12 +104,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onSuccess(String data) {
                 if(data.equals("true")){
-                    Log.d("yael",data);
                     enable_switch.setChecked(true);
                 }
                 else{
-                    Log.d("yael",data);
-
                     enable_switch.setChecked(false);
                 }
 
@@ -190,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == SMS_PERMISSION_CODE){
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                enable_switch.setChecked(true);
                 Toast.makeText(this, "Permission GRANTED", Toast.LENGTH_SHORT).show();
             }
             else{
