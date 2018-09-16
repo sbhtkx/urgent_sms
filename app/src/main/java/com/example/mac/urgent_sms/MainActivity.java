@@ -3,6 +3,7 @@ package com.example.mac.urgent_sms;
 import android.Manifest;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,6 +11,8 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
+import android.os.VibrationEffect;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -34,6 +37,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import android.support.v4.app.NotificationCompat;
+import android.os.Vibrator;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView welcome;
@@ -248,16 +252,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mp.release();
                 AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
                 audioManager.setRingerMode(formerMode);
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                // Vibrate for 500 milliseconds
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    v.vibrate(VibrationEffect.createOneShot(500,VibrationEffect.DEFAULT_AMPLITUDE));
+                }else{
+                    //deprecated in API 26
+                    v.vibrate(500);
+                }
             }
 
         });
-
     }
-
-    private void setFormerMode(int newFromerMode){
-        formerMode = newFromerMode;
-    }
-
-
 
 }
