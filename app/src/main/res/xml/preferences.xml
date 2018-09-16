@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="General">
+        <Preference
+            android:key="pref_urgent_contacts"
+            android:title="set urgent contacts"
+            android:summary="SMS from urgent contact increases its urgency">
+        </Preference>
+
+        <Preference
+            android:key="pref_urgent_words"
+            android:title="set urgent words"
+            android:summary="SMS with urgent word increases its urgency">
+        </Preference>
+
+
+
+
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Notifications">
+
+
+    </PreferenceCategory>
+
+
+
+
+</PreferenceScreen>

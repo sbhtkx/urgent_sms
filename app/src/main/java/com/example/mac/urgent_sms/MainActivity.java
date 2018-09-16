@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -43,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.setting_bar);
         setSupportActionBar(toolbar);
+
+        PreferenceManager.setDefaultValues(this,R.xml.preferences,false);
 
         auth = FirebaseAuth.getInstance();
         welcome = (TextView) findViewById(R.id.welcome_txt);
