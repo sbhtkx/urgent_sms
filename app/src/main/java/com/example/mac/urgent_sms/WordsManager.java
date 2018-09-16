@@ -42,16 +42,7 @@ public class WordsManager {
             String s = stk.nextToken();
             words.add(s);
         }
-        for (String s:voc) {
-            Log.d("wwword", s);
-            if(s.contains("what"))Log.d("wwword1","@"+s+"@");
-        }
         for(int i = 0; i<voc.length; i++){
-            Log.d("wvoc", voc[i]);
-            if(voc[i].equals("what")){
-                Log.d("whaaat","0");
-                if(words.contains(voc[i])) Log.d("whaaat","1");
-            }
             if(words.contains(voc[i])){
                 vector[i] = 1; // vector[i] + 1
             }
@@ -59,7 +50,6 @@ public class WordsManager {
                 vector[i] = 0;
             }
         }
-        Log.d("s2v",str+": "+Arrays.toString(vector));
         return vector;
     }
 }

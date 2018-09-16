@@ -1,10 +1,16 @@
 package com.example.mac.urgent_sms;
 
 import android.Manifest;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -29,6 +35,7 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import android.support.v4.app.NotificationCompat;
 
 import java.util.ArrayList;
 
@@ -42,6 +49,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MyDatabase my_database = MyFirebaseDatabase.getInstance();
     private FirebaseAuth auth;
 
+    NotificationCompat.Builder notification;  // daniel
+    private static final int uniqueID = 452345245;  // the system needs it to manage notifications
+    int formerMode =0;  // the ringer mode to back to on competion of ringtone, need to be a field because i don't know other way to send it to onCompletion()
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +63,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setSupportActionBar(toolbar);
 
         //default settings
+
+        notification = new NotificationCompat.Builder(this,"default"); // not sure about channel_id...
+        notification.setAutoCancel(true);
+
         PreferenceManager.setDefaultValues(this,R.xml.preferences,false);
 
         auth = FirebaseAuth.getInstance();
@@ -65,8 +80,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         settings.setOnClickListener(this);
 
         enable_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+            AudioManager audioManager =
+                    (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+            MsgClassifier msgClassifier = new MsgClassifier(new WordsManager(getAssets()), getAssets());
+
             public void onCheckedChanged(CompoundButton button, boolean isChecked){
                 if(isChecked){
+
                     //checks for permission
                     if(ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED){
                         enable_switch.setChecked(false);
@@ -86,9 +106,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         });
                     }
 
+
+                    formerMode = audioManager.getRingerMode();
+                    my_database.setSwitchState(true);
+                    audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                    SmsReceiver.bindListener(new SmsListener() {
+                        @Override
+                        public void messageReceived(String messageText, String sender) {
+                            if(msgClassifier.isUrgent(messageText)){
+                                sendNotification(messageText);
+                            }
+                            sendNotification(messageText);  // just for testing!!! delete!!!
+                        }
+                    });
                 }
                 else{
                     my_database.setSwitchState(false);
+                    audioManager.setRingerMode(formerMode);
                 }
 
             }
@@ -206,6 +240,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
+
+    private void sendNotification(String msg){
+
+        // Build the notification
+        notification.setSmallIcon(R.drawable.alert);//
+        notification.setTicker("Urgent message!");
+        notification.setWhen(System.currentTimeMillis());
+        notification.setContentTitle("Urgent message!");
+        notification.setContentText(msg);
+
+        Intent intent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        notification.setContentIntent(pendingIntent);
+
+        // Builds notification and issues it
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        nm.notify(uniqueID, notification.build());
+
+        // play ringtone
+        MediaPlayer mp = MediaPlayer.create(this, R.raw.short_sms);
+        AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+        audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+        mp.start();
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.release();
+                AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+                audioManager.setRingerMode(formerMode);
+            }
+
+        });
+
+    }
+
+    private void setFormerMode(int newFromerMode){
+        formerMode = newFromerMode;
+    }
+
 
 
 }
