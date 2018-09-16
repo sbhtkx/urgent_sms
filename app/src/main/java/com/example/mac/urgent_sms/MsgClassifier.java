@@ -46,7 +46,6 @@ public class MsgClassifier {
         float[][] activation1 = matRelu(z1);
         float z2 = matMul(activation1,w2)[0][0] + b2;
         double y = 1 / (1 + Math.exp(-z2));
-        Log.d("uc1",msg+": "+String.valueOf(y));
         return y > threshold;
     }
 
