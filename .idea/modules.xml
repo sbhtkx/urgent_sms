@@ -3,7 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/urgent_sms.iml" filepath="$PROJECT_DIR$/urgent_sms.iml" />
+      <module fileurl="file://$PROJECT_DIR$/final_pro.iml" filepath="$PROJECT_DIR$/final_pro.iml" />
+      <module fileurl="file://C:\Users\Mac\Desktop\final_project\final_pro\urgent_sms.iml" filepath="C:\Users\Mac\Desktop\final_project\final_pro\urgent_sms.iml" />
     </modules>
   </component>
 </project>
