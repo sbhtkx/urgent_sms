@@ -8,6 +8,7 @@ public class Contact {
 
     private String name;
     private String phone_number;
+    private int urgency_level;
     private String img_address;
 
     private Contact(){
@@ -29,5 +30,13 @@ public class Contact {
 
     public String getImageAddress(){
         return img_address;
+    }
+
+    public int getUrgencyLevel(){
+        return urgency_level;
+    }
+
+    public void setUrgencyLevel(int urgency_level){
+        this.urgency_level = urgency_level;
     }
 }

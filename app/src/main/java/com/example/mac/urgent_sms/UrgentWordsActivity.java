@@ -27,7 +27,6 @@ public class UrgentWordsActivity extends AppCompatActivity implements View.OnCli
     private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
     private ArrayList<Word> urgentWords_list;
     private CustomAdapter customAdapter = new CustomAdapter();
-    final private String[] urgency_level = new String[]{};
     private Dialog dialog_add_word;
 
 
@@ -83,7 +82,10 @@ public class UrgentWordsActivity extends AppCompatActivity implements View.OnCli
                 }
                 EditText enter_word = (EditText) dialog_add_word.findViewById(R.id.enter_word_txt);
                 String new_word = enter_word.getText().toString();
-                if(!isWordAlreadyExist(new_word)){
+                if(new_word.length()==0){
+                    Toast.makeText(UrgentWordsActivity.this, "You haven't entered a word", Toast.LENGTH_SHORT).show();
+                }
+                else if(!isWordAlreadyExist(new_word)){
                     //save the new word
                     Word word = new Word(new_word,urgency_level);
                     urgentWords_list.add(word);
@@ -160,7 +162,6 @@ public class UrgentWordsActivity extends AppCompatActivity implements View.OnCli
                     listView_urg_words.setAdapter(customAdapter);
                 }
             });
-
 
 
             return view;

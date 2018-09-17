@@ -3,17 +3,53 @@
 
     <PreferenceCategory
         android:title="General">
+        <CheckBoxPreference
+            android:key="enable_contacts"
+            android:title="enable urgent contacts">
+
+        </CheckBoxPreference>
         <Preference
             android:key="pref_urgent_contacts"
             android:title="set urgent contacts"
-            android:summary="SMS from urgent contact increases its urgency">
+            android:summary="SMS from urgent contact increases its urgency"
+            android:dependency="enable_contacts">
         </Preference>
+
+        <CheckBoxPreference
+            android:key="enable_words"
+            android:title="enable urgent words"
+            android:defaultValue="true">
+
+        </CheckBoxPreference>
 
         <Preference
             android:key="pref_urgent_words"
             android:title="set urgent words"
-            android:summary="SMS with urgent word increases its urgency">
+            android:summary="SMS with urgent word increases its urgency"
+            android:dependency="enable_words">
         </Preference>
+
+        <CheckBoxPreference
+            android:key="enable_automatic_reply"
+            android:title="enable automatic reply">
+
+        </CheckBoxPreference>
+
+        <ListPreference
+            android:key="automatic_msg"
+            android:title="set automatic reply"
+            android:summary="send reply message in case of an urgent SMS"
+            android:dependency="enable_automatic_reply"
+            >
+
+
+        </ListPreference>
+
+
+
+
+
+
 
 
 

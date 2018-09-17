@@ -69,7 +69,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
 
 
-                Toast.makeText(this,"You have logged in",Toast.LENGTH_LONG).show();
+                Toast.makeText(this,"You are logged in",Toast.LENGTH_LONG).show();
 
                 startActivity(intent_main);
 

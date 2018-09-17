@@ -1,5 +1,6 @@
 package com.example.mac.urgent_sms;
 
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
@@ -11,8 +12,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +29,7 @@ public class UrgentContactsActivity extends AppCompatActivity implements View.On
     private ArrayList<Contact> contacts = new ArrayList<Contact>();
     private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
     private CustomAdapter customAdapter = new CustomAdapter();
+    private Dialog dialog_urgency_level;
 
     private static final int CONTANTS_REQUEST_CODE = 1;
 
@@ -36,6 +41,7 @@ public class UrgentContactsActivity extends AppCompatActivity implements View.On
         listView_urg_contacts = (ListView) findViewById(R.id.listView_urg_contacts);
         add_contact_btn = (ImageButton) findViewById(R.id.img_add_contacts);
         final TextView no_urgent_contacts = (TextView) findViewById(R.id.no_contacts_txt);
+        dialog_urgency_level = new Dialog(this);
         add_contact_btn.setOnClickListener(this);
 
 
@@ -50,13 +56,52 @@ public class UrgentContactsActivity extends AppCompatActivity implements View.On
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == CONTANTS_REQUEST_CODE && resultCode == RESULT_OK){
+            dialog_urgency_level.setContentView(R.layout.activity_add_contact);
             onContactPicked(data);
+            UrgencyLevelDialog();
+
         }
     }
 
+    private void UrgencyLevelDialog(){
+        final RadioGroup radioGroup = (RadioGroup) dialog_urgency_level.findViewById(R.id.rBtn_contact_urgency_level);
+        TextView exit = (TextView) dialog_urgency_level.findViewById(R.id.exit_contact_txt);
+        Button ok_btn = (Button) dialog_urgency_level.findViewById(R.id.ok_contact_urgency_level_btn);
+
+        ok_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int radioBtnId = radioGroup.getCheckedRadioButtonId();
+                RadioButton radioButton =  dialog_urgency_level.findViewById(radioBtnId);
+
+                String urgency_level = radioButton.getText().toString();
+                switch (urgency_level){
+                    case("urgent"):
+                        contacts.get(contacts.size()-1).setUrgencyLevel(1);
+                        break;
+                    case("very urgent"):
+                        contacts.get(contacts.size()-1).setUrgencyLevel(2);
+                        break;
+                    case("extremely urgent"):
+                        contacts.get(contacts.size()-1).setUrgencyLevel(3);
+                        break;
+                }
+                sharedPrefs.setContactList(contacts,getApplication());
+                listView_urg_contacts.setAdapter(customAdapter);
+                dialog_urgency_level.dismiss();
+            }
+        });
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog_urgency_level.dismiss();
+            }
+        });
+
+    }
+
     private void onContactPicked(Intent data) {
-
-
         Cursor cursor = null;
         try {
             String contact_phoneNo =null;
@@ -102,8 +147,7 @@ public class UrgentContactsActivity extends AppCompatActivity implements View.On
                 }
                 else{
                     contacts.add(contact);
-                    sharedPrefs.setContactList(contacts,this);
-                    listView_urg_contacts.setAdapter(customAdapter);
+                    dialog_urgency_level.show();
                 }
 
             }
@@ -145,10 +189,27 @@ public class UrgentContactsActivity extends AppCompatActivity implements View.On
             view = getLayoutInflater().inflate(R.layout.one_contact_from_list,null);
             final TextView contact_name = (TextView) view.findViewById(R.id.contact_name);
             TextView contact_phone = (TextView) view.findViewById(R.id.contact_phone);
+            TextView urgency_level = (TextView) view.findViewById(R.id.urgency_level_contact_txt);
             ImageButton rmv_contact = (ImageButton) view.findViewById(R.id.rmv_contact_btn);
 
             contact_name.setText(contacts.get(i).getName());
             contact_phone.setText(contacts.get(i).getPhoneNumber());
+            switch(contacts.get(i).getUrgencyLevel()){
+                case(1):
+                    urgency_level.setText("urgent");
+                    urgency_level.setTextColor(getResources().getColor(R.color.yellowColor));
+                    break;
+
+                case(2):
+                    urgency_level.setText("very urgent");
+                    urgency_level.setTextColor(getResources().getColor(R.color.orangeColor));
+                    break;
+
+                case(3):
+                    urgency_level.setText("extremely urgent");
+                    urgency_level.setTextColor(getResources().getColor(R.color.redColor));
+                    break;
+            }
 
             rmv_contact.setOnClickListener(new View.OnClickListener() {
                 @Override

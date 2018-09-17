@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.annotation.NonNull;
@@ -24,7 +25,8 @@ import java.util.ArrayList;
 public class SettingsFragment extends PreferenceFragment {
 
     private static final int CONTACTS_PERMISSION_CODE = 123;
-    //private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
+    CheckBoxPreference enable_contacts;
+    private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
 
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -34,18 +36,34 @@ public class SettingsFragment extends PreferenceFragment {
 
         Preference urg_contacts_pref = (Preference) findPreference("pref_urgent_contacts");
         Preference urg_words_pref = (Preference) findPreference("pref_urgent_words");
-        urg_contacts_pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        final CheckBoxPreference enable_words = (CheckBoxPreference) findPreference("enable_words");
+        enable_contacts = (CheckBoxPreference) findPreference("enable_contacts");
+        enable_contacts.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED){
+                    enable_contacts.setChecked(false);
                     requestContactsPermission();
-                }
-                else{
-                    Intent intent = new Intent("com.example.mac.urgent_sms.UrgentContactsActivity");
-                    startActivity(intent);
-                }
 
+                }
+                sharedPrefs.setContactsState(enable_contacts.isChecked(),getActivity());
+                return true;
+            }
+        });
 
+        enable_words.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object o) {
+
+                sharedPrefs.setWordsState(enable_words.isChecked(),getActivity());
+                return true;
+            }
+        });
+        urg_contacts_pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent intent = new Intent("com.example.mac.urgent_sms.UrgentContactsActivity");
+                startActivity(intent);
                 return true;
             }
         });
@@ -68,7 +86,6 @@ public class SettingsFragment extends PreferenceFragment {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.READ_CONTACTS},CONTACTS_PERMISSION_CODE);
-
                         }
                     })
                     .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -89,9 +106,9 @@ public class SettingsFragment extends PreferenceFragment {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == CONTACTS_PERMISSION_CODE){
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                enable_contacts.setChecked(true);
                 Toast.makeText(getActivity(), "Permission GRANTED", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent("com.example.mac.urgent_sms.UrgentContactsActivity");
-                startActivity(intent);
+
             }
             else{
                 Toast.makeText(getActivity(), "Permission DENIED", Toast.LENGTH_SHORT).show();

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="250dp"
+    android:layout_gravity="center">
+
+
+    <RadioGroup
+        android:id="@+id/rBtn_contact_urgency_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="70dp"
+        android:layout_marginLeft="60dp"
+
+        >
+
+        <RadioButton
+            android:id="@+id/rBtn_contact_level1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="urgent"
+            android:textColor="@color/yellowColor"
+            android:fontFamily="@font/aclonica"
+            android:checked="true"
+            android:buttonTint="@color/colorPrimary"
+            />
+
+
+        <RadioButton
+            android:id="@+id/rBtn_contact_level2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="very urgent"
+            android:textColor="@color/orangeColor"
+            android:fontFamily="@font/aclonica"
+
+            />
+
+        <RadioButton
+            android:id="@+id/rBtn_contact_level3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="extremely urgent"
+            android:textColor="@color/redColor"
+            android:fontFamily="@font/aclonica"
+
+            />
+
+
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/ok_contact_urgency_level_btn"
+        android:layout_width="40dp"
+        android:layout_height="35dp"
+        android:text="ok"
+        android:textSize="12dp"
+        android:layout_marginLeft="125dp"
+        android:layout_marginTop="200dp"
+        android:background="@color/colorPrimary"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="55dp"
+        android:layout_marginTop="15dp"
+        android:fontFamily="casual"
+        android:text="Add contact urgency"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:textColor="@color/colorDark"/>
+
+    <TextView
+        android:id="@+id/exit_contact_txt"
+        android:layout_width="15dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/textView"
+        android:layout_toRightOf="@+id/textView"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="10dp"
+        android:text="X"
+        android:textAlignment="center"
+        android:background="@color/colorPrimary"/>
+
+
+
+</RelativeLayout>

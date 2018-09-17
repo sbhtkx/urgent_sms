@@ -97,4 +97,42 @@ public class MySharedPreferences {
         }
     }
 
+
+    public void setContactsState(boolean enable, Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor  = prefs.edit();
+        editor.putString("enable contacts",""+enable);
+        editor.apply();
+    }
+
+    public boolean getContactsState(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String state = prefs.getString("enable contacts",null);
+        if(state.equals("true")){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public void setWordsState(boolean enable, Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor  = prefs.edit();
+        editor.putString("enable words",""+enable);
+        editor.apply();
+    }
+
+    public boolean getWordsState(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String state = prefs.getString("enable words",null);
+        if(state.equals("true")){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+
 }
