@@ -49,9 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button logout_btn;
     private Button settings;
     final static int SMS_PERMISSION_CODE = 1;
-
-    private MyDatabase my_database = MyFirebaseDatabase.getInstance();
-    private FirebaseAuth auth;
+    private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
 
     NotificationCompat.Builder notification;  // daniel
     private static final int uniqueID = 452345245;  // the system needs it to manage notifications
@@ -67,16 +65,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setSupportActionBar(toolbar);
 
         //default settings
+        PreferenceManager.setDefaultValues(this,R.xml.preferences,false);
 
         notification = new NotificationCompat.Builder(this,"default"); // not sure about channel_id...
         notification.setAutoCancel(true);
 
-        PreferenceManager.setDefaultValues(this,R.xml.preferences,false);
-
-        auth = FirebaseAuth.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
         welcome = (TextView) findViewById(R.id.welcome_txt);
         enable_switch = (ToggleButton) findViewById(R.id.switch_enable_app);
-        welcome.setText("Hello                                                                                " +my_database.getName()+",");
+        welcome.setText("Hello                                                                                " +auth.getCurrentUser().getDisplayName()+",");
         logout_btn= (Button) findViewById(R.id.logout_btn);
         settings = (Button) findViewById(R.id.settings_btn);
         logout_btn.setOnClickListener(this);
@@ -98,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     else{ //permission granted
                         enable_switch.setChecked(true);
-                        my_database.setSwitchState(true);
+                        sharedPrefs.setSwitchState(true,getApplication());
                         SmsReceiver.bindListener(new SmsListener() {
                             @Override
                             public void messageReceived(String messageText, String sender) {
@@ -112,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
                     formerMode = audioManager.getRingerMode();
-                    my_database.setSwitchState(true);
+                    sharedPrefs.setSwitchState(true,getApplication());
                     audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
                     SmsReceiver.bindListener(new SmsListener() {
                         @Override
@@ -125,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     });
                 }
                 else{
-                    my_database.setSwitchState(false);
+                    sharedPrefs.setSwitchState(false,getApplication());
                     audioManager.setRingerMode(formerMode);
                 }
 
@@ -138,20 +135,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onStart() {
         super.onStart();
 
-        my_database.getSwitchState(new MyCallback<String>() {
-            @Override
-            public void onSuccess(String data) {
-                if(data.equals("true")){
-                    enable_switch.setChecked(true);
-                }
-                else{
-                    enable_switch.setChecked(false);
-                }
-
-            }
-        });
-
-
+        if(sharedPrefs.getSwitchState(this)){
+            enable_switch.setChecked(true);
+        }
+        else{
+            enable_switch.setChecked(false);
+        }
 
     }
 

@@ -23,7 +23,8 @@ public class UrgentContactsActivity extends AppCompatActivity implements View.On
     private ImageButton add_contact_btn;
     private  ListView listView_urg_contacts;
     private ArrayList<Contact> contacts = new ArrayList<Contact>();
-    private MyDatabase my_database = MyFirebaseDatabase.getInstance();
+    private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
+    private CustomAdapter customAdapter = new CustomAdapter();
 
     private static final int CONTANTS_REQUEST_CODE = 1;
 
@@ -37,24 +38,9 @@ public class UrgentContactsActivity extends AppCompatActivity implements View.On
         final TextView no_urgent_contacts = (TextView) findViewById(R.id.no_contacts_txt);
         add_contact_btn.setOnClickListener(this);
 
-        my_database.getContactList(new MyCallback<ArrayList<Contact>>() {
-            @Override
-            public void onSuccess(ArrayList<Contact> data) {
-                contacts = data;
 
-                if(contacts.size() == 0){
-                    no_urgent_contacts.setText("No urgent contacts");
-                }
-                else{
-                    no_urgent_contacts.setText("");
-                }
-                CustomAdapter customAdapter = new CustomAdapter();
-                listView_urg_contacts.setAdapter(customAdapter);
-            }
-        });
-
-
-
+        contacts = sharedPrefs.getContactList(this);
+        listView_urg_contacts.setAdapter(customAdapter);
 
     }
 
@@ -78,8 +64,6 @@ public class UrgentContactsActivity extends AppCompatActivity implements View.On
             // getData() method will have the Content Uri of the selected contact
             Uri uri = data.getData();
 
-
-            //ContactsContract.CommonDataKinds.Phone.CONTENT_URI
             //Query the content uri
             cursor = getContentResolver().query(uri, null, null, null, null);
 
@@ -113,18 +97,15 @@ public class UrgentContactsActivity extends AppCompatActivity implements View.On
 
                 }
                 Contact contact = new Contact(contact_name,contact_phoneNo);
-//                Toast.makeText(this, isContactAlreadyExist(contact_phoneNo)+"", Toast.LENGTH_SHORT).show();
-//                if(isContactAlreadyExist(contact_phoneNo)){
-//                    Toast.makeText(this, contact.getName()+" is already on your urgent list", Toast.LENGTH_SHORT).show();
-//                }
-//                else{
+                if(isContactAlreadyExist(contact_phoneNo)){
+                    Toast.makeText(this, contact.getName()+" is already in your urgent list", Toast.LENGTH_SHORT).show();
+                }
+                else{
                     contacts.add(contact);
-                    my_database.setContactList(contacts);
-                //}
+                    sharedPrefs.setContactList(contacts,this);
+                    listView_urg_contacts.setAdapter(customAdapter);
+                }
 
-
-                //Toast.makeText(this, contact_name+" was added to your urgent contact list", Toast.LENGTH_SHORT).show();
-                //Toast.makeText(this, "phone number: "+contact_phoneNo, Toast.LENGTH_SHORT).show();
             }
 
         } catch (Exception e) {
@@ -173,7 +154,9 @@ public class UrgentContactsActivity extends AppCompatActivity implements View.On
                 @Override
                 public void onClick(View view) {
                     contacts.remove(i);
-                    my_database.setContactList(contacts);
+                    sharedPrefs.setContactList(contacts,getApplication());
+                    listView_urg_contacts.setAdapter(customAdapter);
+
                 }
             });
 
