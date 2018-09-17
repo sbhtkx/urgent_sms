@@ -6,59 +6,44 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/contact_img"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="13dp"
-        android:layout_marginStart="13dp"
-        android:layout_marginTop="13dp"
-        app:srcCompat="@drawable/com_facebook_profile_picture_blank_square"
-        tools:layout_editor_absoluteX="7dp"
-        tools:layout_editor_absoluteY="16dp" />
 
     <TextView
-        android:id="@+id/contact_name"
+        android:id="@+id/word_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/rmv_contact_btn"
-        android:layout_marginLeft="23dp"
-        android:layout_marginStart="23dp"
-        android:layout_toEndOf="@+id/contact_img"
-        android:layout_toRightOf="@+id/contact_img"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="18dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="18dp"
         android:fontFamily="@font/nice_font"
-        android:text="yael pesso"
+        android:text="meeting"
         android:textSize="18dp"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/contact_phone"
+    <ImageButton
+        android:id="@+id/rmv_word_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/contact_name"
-        android:layout_alignBottom="@+id/contact_name"
-        android:layout_marginLeft="38dp"
-        android:layout_marginStart="38dp"
-        android:layout_toEndOf="@+id/contact_name"
-        android:layout_toRightOf="@+id/contact_name"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/word_txt"
+        android:layout_marginRight="17dp"
+        android:background="@color/noColor"
+        android:src="@drawable/rmv_word" />
+
+    <TextView
+        android:id="@+id/urgency_level_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/rmv_word_btn"
+        android:layout_marginEnd="83dp"
+        android:layout_marginRight="83dp"
+        android:layout_toLeftOf="@+id/rmv_word_btn"
+        android:layout_toStartOf="@+id/rmv_word_btn"
         android:fontFamily="@font/nice_font"
-        android:text="0509011123"
-        android:textSize="15dp"
+        android:text="urgent"
+        android:textSize="18dp"
         android:textStyle="bold" />
 
-    <ImageButton
-        android:id="@+id/rmv_contact_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/contact_img"
-        android:layout_marginEnd="25dp"
-        android:layout_marginRight="25dp"
-        app:srcCompat="@drawable/rmv_contact"
-        android:background="@color/noColor"/>
 
 </RelativeLayout>

@@ -1,6 +1,7 @@
 package com.example.mac.urgent_sms;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
@@ -29,9 +30,6 @@ public class MySharedPreferences {
         return instance;
     }
 
-    public String getUserId() {
-        return null;
-    }
 
     public void setSwitchState(boolean state, Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -51,19 +49,12 @@ public class MySharedPreferences {
         }
     }
 
-    public String getName() {
-        return null;
-    }
 
-    public void setName() {
-
-    }
-
-    public void setContactList(ArrayList<Contact> contacts, Context context) {
+    public void setContactList(ArrayList<Contact> urgent_contacts, Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor  = prefs.edit();
         Gson gson = new Gson();
-        String json = gson.toJson(contacts);
+        String json = gson.toJson(urgent_contacts);
         editor.putString("urgent contacts",json);
         editor.apply();
     }
@@ -81,4 +72,29 @@ public class MySharedPreferences {
 
         }
     }
+
+
+    public void setUrgentWordsList(ArrayList<Word> urgent_words, Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor  = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(urgent_words);
+        editor.putString("urgent words",json);
+        editor.apply();
+    }
+
+    public ArrayList<Word> getUrgentWordsList(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Gson gson = new Gson();
+        String json = prefs.getString("urgent words",null);
+        Type type = new TypeToken<ArrayList<Word>>(){}.getType();
+        if(gson.fromJson(json, type) == null){
+            return new ArrayList<Word>();
+        }
+        else{
+            return gson.fromJson(json, type);
+
+        }
+    }
+
 }
