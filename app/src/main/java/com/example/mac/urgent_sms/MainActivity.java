@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     NotificationCompat.Builder notification;  // daniel
     private static final int uniqueID = 452345245;  // the system needs it to manage notifications
-    int formerMode =0;  // the ringer mode to back to on competion of ringtone, need to be a field because i don't know other way to send it to onCompletion()
+    int formerMode =0;  // the ringer mode to back to on completion of ringtone, need to be a field because i don't know other way to send it to onCompletion()
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

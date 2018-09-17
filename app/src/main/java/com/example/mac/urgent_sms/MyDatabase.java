@@ -17,4 +17,7 @@ public interface MyDatabase {
     public void setContactList(ArrayList<Contact> contacts);
     public void getContactList(MyCallback<ArrayList<Contact>> callback);
 
+    public void setWordList(ArrayList<String> words);
+    public void getWordList(MyCallback<ArrayList<String>> callback);
+
 }

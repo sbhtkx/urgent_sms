@@ -100,4 +100,30 @@ public class MyFirebaseDatabase implements MyDatabase {
 
 
     }
+
+    @Override
+    public void setWordList(ArrayList<String> words) {
+        database.child("words").child(getUserId()).child("urgent words").setValue(words);
+    }
+
+    @Override
+    public void getWordList(final MyCallback<ArrayList<String>> callback) {
+        database.child("words").child(getUserId()).child("urgent words").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<ArrayList<String>> t = new GenericTypeIndicator<ArrayList<String>>() {};
+                if(dataSnapshot.getValue() == null){
+                    callback.onSuccess(new ArrayList<String>());
+                }
+                else{
+                    callback.onSuccess(dataSnapshot.getValue(t));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 }
