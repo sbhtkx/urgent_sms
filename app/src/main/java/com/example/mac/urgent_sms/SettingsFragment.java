@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public class SettingsFragment extends PreferenceFragment {
 
     private static final int CONTACTS_PERMISSION_CODE = 123;
-    private MyDatabase my_database = MyFirebaseDatabase.getInstance();
+    //private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
 
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -90,7 +90,6 @@ public class SettingsFragment extends PreferenceFragment {
         if(requestCode == CONTACTS_PERMISSION_CODE){
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 Toast.makeText(getActivity(), "Permission GRANTED", Toast.LENGTH_SHORT).show();
-                my_database.setContactList(new ArrayList<Contact>());
                 Intent intent = new Intent("com.example.mac.urgent_sms.UrgentContactsActivity");
                 startActivity(intent);
             }

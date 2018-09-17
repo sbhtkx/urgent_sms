@@ -14,7 +14,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     private static final int RC_SIGN_IN = 0;
     private FirebaseAuth auth;
-    private MyDatabase my_database = MyFirebaseDatabase.getInstance();
+    private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
     Intent intent_main;
     Intent intent_settings;
 
@@ -63,8 +63,11 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         if(requestCode == RC_SIGN_IN){
             if(resultCode == RESULT_OK){
                 //user logged in
-                my_database.setName();
-                my_database.setSwitchState(false);
+                //my_database.setName();
+                //my_database.setSwitchState(false);
+                sharedPrefs.setSwitchState(false,this);
+
+
 
                 Toast.makeText(this,"You have logged in",Toast.LENGTH_LONG).show();
 
