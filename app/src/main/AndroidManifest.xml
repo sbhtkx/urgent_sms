@@ -39,7 +39,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="com.example.mac.urgent_sms.RegisteredActivity" />
 
@@ -79,7 +79,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity" />
-        <activity android:name=".UrgencyLevelFragment" />
+
     </application>
 
 </manifest>

@@ -12,6 +12,7 @@ import android.preference.PreferenceFragment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
  * Created by Mac on 16/09/2018.
  */
 
-public class SettingsFragment extends PreferenceFragment {
+public class SettingsFragment extends PreferenceFragment{
 
     private static final int CONTACTS_PERMISSION_CODE = 123;
     CheckBoxPreference enable_contacts;

@@ -25,7 +25,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_sign_up);
 
         intent_main = new Intent(this,MainActivity.class);
-        intent_settings = new Intent(this,SettingsActivity.class);
 
         WordsManager wm;
         try {
@@ -63,11 +62,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         if(requestCode == RC_SIGN_IN){
             if(resultCode == RESULT_OK){
                 //user logged in
-                //my_database.setName();
-                //my_database.setSwitchState(false);
                 sharedPrefs.setSwitchState(false,this);
-
-
 
                 Toast.makeText(this,"You are logged in",Toast.LENGTH_LONG).show();
 

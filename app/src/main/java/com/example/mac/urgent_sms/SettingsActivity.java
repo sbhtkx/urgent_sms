@@ -1,5 +1,6 @@
 package com.example.mac.urgent_sms;
 
+import android.app.Fragment;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.v7.app.AppCompatActivity;

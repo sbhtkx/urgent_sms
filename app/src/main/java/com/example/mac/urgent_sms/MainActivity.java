@@ -6,29 +6,29 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.Switch;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -38,18 +38,22 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
+
 import android.support.v4.app.NotificationCompat;
 import android.os.Vibrator;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private TextView welcome;
     private ToggleButton enable_switch;
     private Button logout_btn;
     private Button settings;
     final static int SMS_PERMISSION_CODE = 1;
     private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
+    private DrawerLayout drawer;
 
     NotificationCompat.Builder notification;  // daniel
     private static final int uniqueID = 452345245;  // the system needs it to manage notifications
@@ -60,9 +64,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //set settings toolbar
-        android.support.v7.widget.Toolbar toolbar = findViewById(R.id.setting_bar);
+
+
+        //set toolbar
+        android.support.v7.widget.Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
+
+        //set navigation bar
+        drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch(item.getItemId()){
+                    case(R.id.nav_settings):
+                        Intent intent =  new Intent(MainActivity.this,SettingsActivity.class);
+                        startActivity(intent);
+                        break;
+
+                    case(R.id.nav_share):
+                        //Toast.makeText(getApplicationContext(), "hello", Toast.LENGTH_SHORT).show();
+                        break;
+
+                }
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawer,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+
+        //set navigation header
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        View headerView = navigationView.getHeaderView(0);
+        TextView navUsername = (TextView) headerView.findViewById(R.id.my_name);
+        navUsername.setText(user.getDisplayName());
+        TextView navEmail = (TextView) headerView.findViewById(R.id.my_email);
+        navEmail.setText(user.getEmail());
+        ImageView photo = (ImageView) headerView.findViewById(R.id.my_pic);
+        Picasso.with(this).load(user.getPhotoUrl()).resize(150,150).into(photo);
+
+
 
         //default settings
         PreferenceManager.setDefaultValues(this,R.xml.preferences,false);
@@ -131,7 +175,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
     }
+    @Override
+    public void onBackPressed(){
+        if(drawer.isDrawerOpen(GravityCompat.START)){
+            drawer.closeDrawer(GravityCompat.START);
+        }
+        else{
+            super.onBackPressed();
 
+        }
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
 
@@ -143,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
+
 
 
     @Override
