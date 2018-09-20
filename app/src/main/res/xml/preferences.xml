@@ -40,6 +40,8 @@
             android:title="set automatic reply"
             android:summary="send reply message in case of an urgent SMS"
             android:dependency="enable_automatic_reply"
+            android:entries="@array/automatic_reply"
+            android:entryValues="@array/automatic_reply_values"
             >
 
 

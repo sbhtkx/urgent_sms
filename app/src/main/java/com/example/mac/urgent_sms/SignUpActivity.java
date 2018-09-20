@@ -30,8 +30,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         try {
             wm = new WordsManager(getAssets());
             MsgClassifier mc = new MsgClassifier(wm, getAssets());
-            boolean police = mc.isUrgent("asap the police is here!!!");
-            boolean eat = mc.isUrgent("what is planned to eat today?");
+            boolean police = mc.isUrgent("asap the police is here!!!",null,null);
+            boolean eat = mc.isUrgent("what is planned to eat today?",null,null);
             Log.d("urgency","police"+ String.valueOf(police));
             Log.d("urgency","eat"+ String.valueOf(eat));
         }

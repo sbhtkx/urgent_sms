@@ -39,6 +39,7 @@ public class SettingsFragment extends PreferenceFragment{
         Preference urg_words_pref = (Preference) findPreference("pref_urgent_words");
         final CheckBoxPreference enable_words = (CheckBoxPreference) findPreference("enable_words");
         enable_contacts = (CheckBoxPreference) findPreference("enable_contacts");
+
         enable_contacts.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {

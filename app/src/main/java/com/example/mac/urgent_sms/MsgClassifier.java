@@ -2,13 +2,24 @@ package com.example.mac.urgent_sms;
 
 import android.content.res.AssetManager;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 import android.util.Log;
+import android.widget.Toast;
+
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.HasWord;
+import edu.stanford.nlp.process.CoreLabelTokenFactory;
+import edu.stanford.nlp.process.DocumentPreprocessor;
+import edu.stanford.nlp.process.PTBTokenizer;
+
 
 
 public class MsgClassifier {
@@ -31,10 +42,13 @@ public class MsgClassifier {
             b2 = loadNumber("b2.txt");
         }catch(Exception e){
         }
-        threshold = 0.8;
+        threshold = 0.5;
     }
 
-    public boolean isUrgent(String msg){
+    public boolean isUrgent(String msg, ArrayList<Contact> contacts,ArrayList<Word> words){
+
+        
+
         int[] w= wm.stringToVector(msg);
         float[][] x = new float[1][w.length];
         for(int i = 0; i < x[0].length; i++){
@@ -46,6 +60,7 @@ public class MsgClassifier {
         float[][] activation1 = matRelu(z1);
         float z2 = matMul(activation1,w2)[0][0] + b2;
         double y = 1 / (1 + Math.exp(-z2));
+        Log.d("ans",""+y);
         return y > threshold;
     }
 
@@ -165,4 +180,7 @@ public class MsgClassifier {
         }
         return B;
     }
+
+
+
 }

@@ -46,7 +46,7 @@ import android.os.Vibrator;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     private TextView welcome;
     private ToggleButton enable_switch;
     private Button logout_btn;
@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     final static int SMS_PERMISSION_CODE = 1;
     private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
     private DrawerLayout drawer;
+
 
     NotificationCompat.Builder notification;  // daniel
     private static final int uniqueID = 452345245;  // the system needs it to manage notifications
@@ -64,8 +65,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         //set toolbar
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
@@ -73,24 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //set navigation bar
         drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch(item.getItemId()){
-                    case(R.id.nav_settings):
-                        Intent intent =  new Intent(MainActivity.this,SettingsActivity.class);
-                        startActivity(intent);
-                        break;
-
-                    case(R.id.nav_share):
-                        //Toast.makeText(getApplicationContext(), "hello", Toast.LENGTH_SHORT).show();
-                        break;
-
-                }
-                drawer.closeDrawer(GravityCompat.START);
-                return true;
-            }
-        });
+        navigationView.setNavigationItemSelectedListener(this);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawer,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
@@ -106,24 +88,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ImageView photo = (ImageView) headerView.findViewById(R.id.my_pic);
         Picasso.with(this).load(user.getPhotoUrl()).resize(150,150).into(photo);
 
-
-
-        //default settings
+        //set default settings
         PreferenceManager.setDefaultValues(this,R.xml.preferences,false);
 
         notification = new NotificationCompat.Builder(this,"default"); // not sure about channel_id...
         notification.setAutoCancel(true);
 
-        FirebaseAuth auth = FirebaseAuth.getInstance();
         welcome = (TextView) findViewById(R.id.welcome_txt);
         enable_switch = (ToggleButton) findViewById(R.id.switch_enable_app);
-        welcome.setText("Hello                                                                                " +auth.getCurrentUser().getDisplayName()+",");
+        welcome.setText("Hello                                                                                " +user.getDisplayName()+",");
         logout_btn= (Button) findViewById(R.id.logout_btn);
         settings = (Button) findViewById(R.id.settings_btn);
         logout_btn.setOnClickListener(this);
         welcome.setOnClickListener(this);
         settings.setOnClickListener(this);
 
+        //set main switch
         enable_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             AudioManager audioManager =
                     (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
@@ -158,10 +138,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     SmsReceiver.bindListener(new SmsListener() {
                         @Override
                         public void messageReceived(String messageText, String sender) {
-                            if(msgClassifier.isUrgent(messageText)){
+                            if(msgClassifier.isUrgent(messageText,null,null)){
                                 sendNotification(messageText);
                             }
-                            sendNotification(messageText);  // just for testing!!! delete!!!
+                            //sendNotification(messageText);  // just for testing!!! delete!!!
                         }
                     });
                 }
@@ -174,7 +154,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         });
 
-    }
+    } //end of onCreate
+
     @Override
     public void onBackPressed(){
         if(drawer.isDrawerOpen(GravityCompat.START)){
@@ -209,11 +190,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent_settings = new Intent(this, SettingsActivity.class);
-        startActivity(intent_settings);
-        return super.onOptionsItemSelected(item);
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch(item.getItemId()){
+            case(R.id.nav_settings):
+                Intent intent =  new Intent(MainActivity.this,SettingsActivity.class);
+                startActivity(intent);
+                break;
+
+            case(R.id.nav_share):
+                //Toast.makeText(getApplicationContext(), "hello", Toast.LENGTH_SHORT).show();
+                break;
+
+        }
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
+
+
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        Intent intent_settings = new Intent(this, SettingsActivity.class);
+//        startActivity(intent_settings);
+//        return super.onOptionsItemSelected(item);
+//    }
 
     @Override
     public void onClick(View view) {

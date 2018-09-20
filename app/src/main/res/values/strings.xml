@@ -16,6 +16,24 @@
 
     </string-array>
 
+    <string-array name="automatic_reply">
+        <item>I am busy right now, will contact you later</item>
+        <item>I am in a meeting right now, will contact you later</item>
+        <item>This is an automatic reply. I am in a meeting, will contact you later</item>
+        <item>This is an automatic reply. I am busy right now, will contact you later</item>
+
+    </string-array>
+
+    <string-array name="automatic_reply_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+
+    </string-array>
+
+
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_navigation_bar">NavigationBarActivity</string>
