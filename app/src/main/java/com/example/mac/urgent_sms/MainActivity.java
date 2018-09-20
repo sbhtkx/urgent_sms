@@ -10,18 +10,20 @@ import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,7 +34,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import android.widget.Toolbar;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -40,11 +41,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
-
-import android.support.v4.app.NotificationCompat;
-import android.os.Vibrator;
-
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private TextView welcome;
@@ -55,6 +51,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
     private DrawerLayout drawer;
 
+
+
+
+
+
+
     NotificationCompat.Builder notification;  // daniel
     private static final int uniqueID = 452345245;  // the system needs it to manage notifications
     int formerMode =0;  // the ringer mode to back to on completion of ringtone, need to be a field because i don't know other way to send it to onCompletion()
@@ -63,6 +65,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // daniel
+        DataManager dm = new DataManager(getApplicationContext());
+//        dm.fetchData();
+
+        double[][] w1 = dm.loadMatrix("w1");
 
 
 
