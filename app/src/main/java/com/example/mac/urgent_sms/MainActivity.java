@@ -206,7 +206,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case(R.id.nav_share):
-                //intent = new Intent(MainActivity.this,
+                Intent share_intent = new Intent(Intent.ACTION_SEND);
+                share_intent.setType("text/plain");
+                String subject = "Download Urgent SMS";
+                String body = "www.google.com";
+                share_intent.putExtra(Intent.EXTRA_SUBJECT,subject);
+                share_intent.putExtra(Intent.EXTRA_TEXT,body);
+                startActivity(Intent.createChooser(share_intent, "Share using"));
+
                 break;
 
 

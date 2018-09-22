@@ -170,11 +170,11 @@ public class MySharedPreferences {
         Type type = new TypeToken<ArrayList<String>>(){}.getType();
         if(gson.fromJson(json, type) == null){
             ArrayList<String> temp = new ArrayList<String>();
-            temp.add(getApplicationContext().getResources().getString(R.string.automatic_reply_1));
-            temp.add(getApplicationContext().getResources().getString(R.string.automatic_reply_2));
-            temp.add(getApplicationContext().getResources().getString(R.string.automatic_reply_3));
-            temp.add(getApplicationContext().getResources().getString(R.string.automatic_reply_4));
-            setAutoReplyList(temp,getApplicationContext());
+            temp.add(context.getResources().getString(R.string.automatic_reply_1));
+            temp.add(context.getResources().getString(R.string.automatic_reply_2));
+            temp.add(context.getResources().getString(R.string.automatic_reply_3));
+            temp.add(context.getResources().getString(R.string.automatic_reply_4));
+            setAutoReplyList(temp,context);
             return temp;
         }
         else{

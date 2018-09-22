@@ -85,6 +85,10 @@ public class UrgentContactsActivity extends AppCompatActivity implements View.On
                     case("extremely urgent"):
                         contacts.get(contacts.size()-1).setUrgencyLevel(3);
                         break;
+
+                    case("always urgent"):
+                    contacts.get(contacts.size()-1).setUrgencyLevel(4);
+                    break;
                 }
                 sharedPrefs.setContactList(contacts,getApplication());
                 listView_urg_contacts.setAdapter(customAdapter);
@@ -208,6 +212,11 @@ public class UrgentContactsActivity extends AppCompatActivity implements View.On
                 case(3):
                     urgency_level.setText("extremely urgent");
                     urgency_level.setTextColor(getResources().getColor(R.color.redColor));
+                    break;
+
+                case(4):
+                    urgency_level.setText("always urgent");
+                    urgency_level.setTextColor(getResources().getColor(R.color.blueColor));
                     break;
             }
 
