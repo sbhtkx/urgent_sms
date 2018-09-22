@@ -20,4 +20,6 @@ public interface MyDatabase {
     public void setWordList(ArrayList<String> words);
     public void getWordList(MyCallback<ArrayList<String>> callback);
 
+    public void getVersion(MyCallback<String> callback);
+
 }

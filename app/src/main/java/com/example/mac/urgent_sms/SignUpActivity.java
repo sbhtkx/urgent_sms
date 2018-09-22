@@ -26,18 +26,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         intent_main = new Intent(this,MainActivity.class);
 
-        WordsManager wm;
-        try {
-            wm = new WordsManager(getAssets());
-            MsgClassifier mc = new MsgClassifier(wm, getAssets());
-            boolean police = mc.isUrgent("asap the police is here!!!");
-            boolean eat = mc.isUrgent("what is planned to eat today?");
-            Log.d("urgency","police"+ String.valueOf(police));
-            Log.d("urgency","eat"+ String.valueOf(eat));
-        }
-        catch(Exception e){
-
-        }
 
         auth = FirebaseAuth.getInstance();
         if(auth.getCurrentUser()!=null){

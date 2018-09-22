@@ -1,36 +1,22 @@
 package com.example.mac.urgent_sms;
 
-import android.content.res.AssetManager;
-
 import android.util.Log;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 public class WordsManager {
 
     private String[] voc;
     private StringTokenizer stk;
 
-    public WordsManager(AssetManager am){
-        // initialize the voc (load from file)
-        String text = "";
+    public WordsManager(DataManager dm){
         try {
-            InputStream is = am.open("voc.txt");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            text = new String(buffer);
-
-        }catch(IOException ex){
-            ex.printStackTrace();
-        }
-        stk = new StringTokenizer(text,"\n");
-        voc = new String[stk.countTokens()];
-        for(int i = 0; i<voc.length; i++){
-            voc[i] = stk.nextToken().replace("\n","").replace("\r","");
+            voc = dm.loadStringArrayFromInternalStorage("vocabulary.data");
+            Log.d("voc111", Arrays.toString(voc));
+        }catch(Exception e){
         }
     }
 

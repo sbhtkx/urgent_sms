@@ -24,6 +24,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -52,11 +53,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private DrawerLayout drawer;
 
 
-
-
-
-
-
     NotificationCompat.Builder notification;  // daniel
     private static final int uniqueID = 452345245;  // the system needs it to manage notifications
     int formerMode =0;  // the ringer mode to back to on completion of ringtone, need to be a field because i don't know other way to send it to onCompletion()
@@ -66,14 +62,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // daniel
-        DataManager dm = new DataManager(getApplicationContext());
-//        dm.fetchData();
+        MyDatabase my_database = MyFirebaseDatabase.getInstance();
+        my_database.setSwitchState(true);
+        my_database.getSwitchState(new MyCallback<String>() {
+            @Override
+            public void onSuccess(String data) {
+                Log.d("updat7","good");
+            }
+        });
 
-        double[][] w1 = dm.loadMatrix("w1");
+        my_database.getVersion( new MyCallback<String>() {
+            @Override
+            public void onSuccess(String data) {
+                Toast.makeText(MainActivity.this, "data: "+data, Toast.LENGTH_SHORT).show();
+                Log.d("updat8","good888");
+            }
+        });
 
-
-
+        Log.d("start1","start");
         //set toolbar
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
@@ -135,7 +141,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         enable_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             AudioManager audioManager =
                     (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-            MsgClassifier msgClassifier = new MsgClassifier(new WordsManager(getAssets()), getAssets());
+            DataManager dm = new DataManager(getApplicationContext());
+            MsgClassifier msgClassifier = new MsgClassifier(new WordsManager(dm), dm);
+//            MsgClassifier msgClassifier = new MsgClassifier(new WordsManager(getAssets()), getAssets());
 
             public void onCheckedChanged(CompoundButton button, boolean isChecked){
                 if(isChecked){

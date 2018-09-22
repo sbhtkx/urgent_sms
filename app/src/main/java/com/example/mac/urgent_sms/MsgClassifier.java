@@ -1,34 +1,27 @@
 package com.example.mac.urgent_sms;
 
-import android.content.res.AssetManager;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
 import android.util.Log;
-
 
 public class MsgClassifier {
 
     private WordsManager wm;
-    private AssetManager am;
-    private float[][] w1;
-    private float[][] w2;
-    private float[][] b1;
-    private float b2;
+    private double[][] w1;
+    private double[][] w2;
+    private double[][] b1;
+    private double b2;
     private double threshold;
 
-    public MsgClassifier(WordsManager wm, AssetManager am){
+    public MsgClassifier(WordsManager wm, DataManager dm){
         this.wm = wm;
-        this.am = am;
         try {
-            w1 = loadMatrix("w1.txt");
-            b1 = loadMatrix("b1.txt");
-            w2 = loadMatrix("w2.txt");
-            b2 = loadNumber("b2.txt");
+            // load data and convert to matrices
+            w1 = dm.loadDoubleMatrixFromInternalStorage("w1.data");
+            double[] b1Array = dm.loadDoubleArrayFromInternalStorage("b1.data");
+            b1 = new double[1][b1Array.length];
+            b1[0] = b1Array;
+//            double[] w2Array = dm.loadDoubleArrayFromInternalStorage("w2.data");
+            w2 = dm.loadDoubleMatrixFromInternalStorage("w2.data");
+            b2 = dm.loadDoubleFromInternalStorage("b2.data");
         }catch(Exception e){
         }
         threshold = 0.8;
@@ -36,98 +29,28 @@ public class MsgClassifier {
 
     public boolean isUrgent(String msg){
         int[] w= wm.stringToVector(msg);
-        float[][] x = new float[1][w.length];
+        double[][] x = new double[1][w.length];
         for(int i = 0; i < x[0].length; i++){
-            x[0][i] = (float)w[i];
+            x[0][i] = (double)w[i];
         }
-        float[][] s = matMul(x, w1);
-        float[][] z1 = matAdd(s, b1);
+        double[][] s = matMul(x, w1);
+        double[][] z1 = matAdd(s, b1);
 
-        float[][] activation1 = matRelu(z1);
-        float z2 = matMul(activation1,w2)[0][0] + b2;
+        double[][] activation1 = matRelu(z1);
+        double z2 = matMul(activation1,w2)[0][0] + b2;
         double y = 1 / (1 + Math.exp(-z2));
+        Log.d("msgc1",Double.toString(y));
         return y > threshold;
     }
 
-//    private float[] loadArray(String file_name) throws Exception {
-//        BufferedReader br;
-//        String line, lines = "";
-//        InputStream is = am.open(file_name);
-//        br = new BufferedReader(new InputStreamReader(is));
-//        while ((line = br.readLine()) != null) {
-//            lines += line;
-//            if (line.equalsIgnoreCase("quit")) {
-//                break;
-//            }
-//        }
-//        StringTokenizer stk = new StringTokenizer(lines, ",\n");
-//        float[] array = new float[stk.countTokens()];
-//        for (int i = 0; i < array.length && stk.hasMoreElements(); i++) {
-//            String s = stk.nextToken();
-//            float f = Float.parseFloat(s);
-//            array[i] = f;
-//        }
-//
-//        br.close();
-//
-//        return array;
-//    }
 
-    private float[][] loadMatrix(String file_name)throws Exception{
-        BufferedReader br;
-        String line, lines = "";
-        InputStream is = am.open(file_name);
-        br = new BufferedReader(new InputStreamReader(is));
-        while ((line = br.readLine()) != null) {
-            lines += line+"\n";
-        }
-        StringTokenizer stkRow = new StringTokenizer(lines,"\n");
-        int countRows = stkRow.countTokens();
-        StringTokenizer stkCol = new StringTokenizer(stkRow.nextToken(),",");
-        float[][] matrice = new float[countRows][stkCol.countTokens()];
-        for(int j = 0; j < matrice[0].length && stkCol.hasMoreElements(); j++){
-            matrice[0][j] = Float.parseFloat(stkCol.nextToken());
-        }
-        for(int i = 1; i < matrice.length && stkRow.hasMoreElements(); i++){
-            stkCol = new StringTokenizer(stkRow.nextToken(),",");
-            for(int j = 0; j < matrice[i].length && stkCol.hasMoreElements(); j++){
-                matrice[i][j] = Float.parseFloat(stkCol.nextToken());
-            }
-        }
-
-        // close the streams using close method
-        try {
-            br.close();
-        }
-        catch (IOException ioe) {
-        }
-
-        return matrice;
-    }
-
-    private float loadNumber(String file_name) throws Exception {
-        BufferedReader br;
-        String line;
-        InputStream is = am.open(file_name);
-        br = new BufferedReader(new InputStreamReader(is));
-        if ((line = br.readLine()) == null) {
-            return 0;
-        }
-        float ans = Float.parseFloat(line);
-        try {
-                br.close();
-        }
-        catch (IOException ioe) {
-        }
-        return ans;
-    }
-
-    public static float[][] matMul(float[][] A, float[][] B){
+    public static double[][] matMul(double[][] A, double[][] B){
         int rowsA = A.length;
         int colsA = A[0].length;
         int colsB = B[0].length;
+        Log.d("eee1","A shape: ["+A.length+","+A[0].length+"]\nB shape: ["+B.length+","+B[0].length+"]");
         //new matrix to hold result
-        float[][] C = new float [rowsA][colsB];
+        double[][] C = new double [rowsA][colsB];
         //start across rows of A
         for (int i = 0; i < rowsA; i++) {
             //work across cols of B
@@ -141,8 +64,8 @@ public class MsgClassifier {
         return C;
     }
 
-    private static float[][] matAdd(float[][] A, float[][] B){
-        float[][] C = new float[A.length][A[0].length];
+    private static double[][] matAdd(double[][] A, double[][] B){
+        double[][] C = new double[A.length][A[0].length];
         for (int i = 0; i < A.length; i++)
         {
             for (int j = 0; j < A[i].length; j++)
@@ -153,8 +76,8 @@ public class MsgClassifier {
         return C;
     }
 
-    private static float[][] matRelu(float[][] A){
-        float[][] B = new float[A.length][A[0].length];
+    private static double[][] matRelu(double[][] A){
+        double[][] B = new double[A.length][A[0].length];
 
         for (int i = 0; i < A.length; i++)
         {
