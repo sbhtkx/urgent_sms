@@ -80,7 +80,33 @@
             </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity" />
+        <activity
+            android:name=".AutomaticReplyActivity"
+            android:label="Set automatic reply">
+            <intent-filter>
+                <action android:name="com.example.mac.urgent_sms.AutomaticReplyActivity" />
 
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".AboutActivity"
+            android:label="About">
+            <intent-filter>
+                <action android:name="com.example.mac.urgent_sms.AboutActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
+        <activity android:name=".ContactUsActivity"
+            android:label="Contact us">
+            <intent-filter>
+                <action android:name="com.example.mac.urgent_sms.ContactUsActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
     </application>
 
 </manifest>

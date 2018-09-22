@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.RingtonePreference;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -26,7 +27,9 @@ import java.util.ArrayList;
 public class SettingsFragment extends PreferenceFragment{
 
     private static final int CONTACTS_PERMISSION_CODE = 123;
+    private static final int SEND_SMS_PERMISSION_CODE = 345;
     CheckBoxPreference enable_contacts;
+    CheckBoxPreference enable_automatic_reply;
     private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
 
     @Override
@@ -35,10 +38,14 @@ public class SettingsFragment extends PreferenceFragment{
 
         addPreferencesFromResource(R.xml.preferences);
 
-        Preference urg_contacts_pref = (Preference) findPreference("pref_urgent_contacts");
-        Preference urg_words_pref = (Preference) findPreference("pref_urgent_words");
         final CheckBoxPreference enable_words = (CheckBoxPreference) findPreference("enable_words");
         enable_contacts = (CheckBoxPreference) findPreference("enable_contacts");
+        Preference urg_contacts_pref = (Preference) findPreference("pref_urgent_contacts");
+        Preference urg_words_pref = (Preference) findPreference("pref_urgent_words");
+        enable_automatic_reply = (CheckBoxPreference) findPreference("enable_automatic_reply");
+        Preference automatic_reply_pref = (Preference) findPreference("pref_automatic_reply");
+        RingtonePreference notification_sound = (RingtonePreference) findPreference("pred_notification_ringtone");
+
 
         enable_contacts.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -78,6 +85,29 @@ public class SettingsFragment extends PreferenceFragment{
             }
         });
 
+
+        enable_automatic_reply.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object o) {
+                if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
+                    enable_automatic_reply.setChecked(false);
+                    requestSensSMSPermission();
+                }
+
+                sharedPrefs.setAutoReplyState(enable_automatic_reply.isChecked(),getActivity());
+                return true;
+            }
+        });
+
+        automatic_reply_pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent intent = new Intent("com.example.mac.urgent_sms.AutomaticReplyActivity");
+                startActivity(intent);
+                return true;
+            }
+        });
+
     }
 
     private void requestContactsPermission(){
@@ -104,12 +134,51 @@ public class SettingsFragment extends PreferenceFragment{
 
     }
 
+    private void requestSensSMSPermission(){
+        if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.SEND_SMS)){
+            new AlertDialog.Builder(getActivity())
+                    .setTitle("Permission needed").setMessage("This permission is needed in order to send automatic reply")
+                    .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_CODE);
+                        }
+                    })
+                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    }).create().show();
+
+        }
+        else{
+            ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_CODE);
+        }
+
+    }
+
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == CONTACTS_PERMISSION_CODE){
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 enable_contacts.setChecked(true);
                 Toast.makeText(getActivity(), "Permission GRANTED", Toast.LENGTH_SHORT).show();
+
+            }
+            else{
+                Toast.makeText(getActivity(), "Permission DENIED", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        else if(requestCode == SEND_SMS_PERMISSION_CODE){
+            if(grantResults.length > 1 && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                enable_automatic_reply.setChecked(true);
+                Toast.makeText(getActivity(), "Permission GRANTED", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent("com.example.mac.urgent_sms.AutomaticReplyActivity");
+                startActivity(intent);
 
             }
             else{

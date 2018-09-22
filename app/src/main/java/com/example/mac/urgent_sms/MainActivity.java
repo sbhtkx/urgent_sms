@@ -24,6 +24,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -42,16 +43,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
-<<<<<<< HEAD
 import android.support.v4.app.NotificationCompat;
 import android.os.Vibrator;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
-=======
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
->>>>>>> 93ac0fdc361b921790563169d66ac024e2c75a65
     private TextView welcome;
     private ToggleButton enable_switch;
     private Button logout_btn;
@@ -59,16 +56,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     final static int SMS_PERMISSION_CODE = 1;
     private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
     private DrawerLayout drawer;
+    MyDatabase my_database = MyFirebaseDatabase.getInstance();
 
-
-<<<<<<< HEAD
-=======
-
-
-
-
-
->>>>>>> 93ac0fdc361b921790563169d66ac024e2c75a65
     NotificationCompat.Builder notification;  // daniel
     private static final int uniqueID = 452345245;  // the system needs it to manage notifications
     int formerMode =0;  // the ringer mode to back to on completion of ringtone, need to be a field because i don't know other way to send it to onCompletion()
@@ -78,17 +67,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-<<<<<<< HEAD
-=======
-        // daniel
-        DataManager dm = new DataManager(getApplicationContext());
-//        dm.fetchData();
-
-        double[][] w1 = dm.loadMatrix("w1");
-
-
-
->>>>>>> 93ac0fdc361b921790563169d66ac024e2c75a65
         //set toolbar
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
@@ -165,6 +143,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             if(msgClassifier.isUrgent(messageText,null,null)){
                                 sendNotification(messageText);
                             }
+                            else{
+                                SendSMS sendSMS = new SendSMS(sender,messageText);
+                                sendSMS.sendMsg();
+                            }
                             //sendNotification(messageText);  // just for testing!!! delete!!!
                         }
                     });
@@ -215,14 +197,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        Intent intent;
         switch(item.getItemId()){
             case(R.id.nav_settings):
-                Intent intent =  new Intent(MainActivity.this,SettingsActivity.class);
+                intent =  new Intent(MainActivity.this,SettingsActivity.class);
                 startActivity(intent);
+
                 break;
 
             case(R.id.nav_share):
-                //Toast.makeText(getApplicationContext(), "hello", Toast.LENGTH_SHORT).show();
+                //intent = new Intent(MainActivity.this,
+                break;
+
+
+            case(R.id.nav_about):
+                intent = new Intent(MainActivity.this,AboutActivity.class);
+                startActivity(intent);
+                break;
+
+            case(R.id.nav_contact_us):
+                intent = new Intent(MainActivity.this,ContactUsActivity.class);
+                startActivity(intent);
                 break;
 
         }
@@ -230,13 +225,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        Intent intent_settings = new Intent(this, SettingsActivity.class);
-//        startActivity(intent_settings);
-//        return super.onOptionsItemSelected(item);
-//    }
 
     @Override
     public void onClick(View view) {
@@ -262,11 +250,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case (R.id.welcome_txt):
                 Intent myAccount_intent = new Intent("com.example.mac.urgent_sms.MyAccountActivity");
                 startActivity(myAccount_intent);
-                break;
-
-            case (R.id.settings_btn):
-                Intent settings_intent = new Intent("com.example.mac.urgent_sms.BettingsActivity");
-                startActivity(settings_intent);
                 break;
 
 

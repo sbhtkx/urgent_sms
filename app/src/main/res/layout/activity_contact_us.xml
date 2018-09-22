@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.mac.urgent_sms.ContactUsActivity">
+
+
+   <EditText
+       android:id="@+id/email_addr_txt"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:inputType="textEmailAddress"
+       android:layout_marginTop="50dp"
+       android:hint="your Email address"
+       android:textColorHint="@color/redColor"
+       android:fontFamily="@font/nice_font"
+       android:layout_marginLeft="10dp"
+       android:textSize="20dp"
+       android:background="@color/noColor"
+       />
+
+    <EditText
+        android:id="@+id/subject_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="110dp"
+        android:hint="subject"
+        android:textColorHint="@color/blueColor"
+        android:fontFamily="@font/nice_font"
+        android:layout_marginLeft="10dp"
+        android:textSize="20dp"
+        android:background="@color/noColor"
+        />
+
+    <EditText
+        android:id="@+id/message_body_txt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="180dp"
+        android:hint="message"
+        android:inputType="textMultiLine"
+        android:fontFamily="@font/nice_font"
+        android:textColorHint="@color/colorDark"
+        android:layout_marginLeft="10dp"
+        android:background="@color/noColor"
+        />
+
+    <Button
+        android:id="@+id/send_btn"
+        android:layout_width="50dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="450dp"
+        android:layout_marginLeft="155dp"
+        android:background="@drawable/ic_send"
+        />
+
+</RelativeLayout>

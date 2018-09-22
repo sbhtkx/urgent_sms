@@ -16,22 +16,18 @@
 
     </string-array>
 
-    <string-array name="automatic_reply">
-        <item>I am busy right now, will contact you later</item>
-        <item>I am in a meeting right now, will contact you later</item>
-        <item>This is an automatic reply. I am in a meeting, will contact you later</item>
-        <item>This is an automatic reply. I am busy right now, will contact you later</item>
+    <!--<string-array name="automatic_reply">-->
+    <!--<item>I am busy right now, will contact you later</item>-->
+    <!--<item>I am in a meeting right now, will contact you later</item>-->
+    <!--<item>This is an automatic reply. I am in a meeting, will contact you later</item>-->
+    <!--<item>This is an automatic reply. I am busy right now, will contact you later</item>-->
 
-    </string-array>
+    <!--</string-array>-->
 
-    <string-array name="automatic_reply_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-
-    </string-array>
-
+    <string name="automatic_reply_1">I am busy right now, will contact you later</string>
+    <string name="automatic_reply_2">This is an automatic reply. \nI am busy right now, will contact you later</string>
+    <string name="automatic_reply_3">I am in a meeting, will contact you later</string>
+    <string name="automatic_reply_4">This is an automatic reply. \nI am in a meeting, will contact you later</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->

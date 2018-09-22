@@ -35,37 +35,40 @@
 
         </CheckBoxPreference>
 
-        <ListPreference
-            android:key="automatic_msg"
+        <Preference
+            android:key="pref_automatic_reply"
             android:title="set automatic reply"
-            android:summary="send reply message in case of an urgent SMS"
+            android:summary="send reply message in case of an un-urgent SMS"
             android:dependency="enable_automatic_reply"
-            android:entries="@array/automatic_reply"
-            android:entryValues="@array/automatic_reply_values"
             >
 
-
-        </ListPreference>
-
-
-
-
-
-
-
-
-
-
-
+        </Preference>
 
     </PreferenceCategory>
 
     <PreferenceCategory
         android:title="Notifications">
 
+        <SwitchPreference
+            android:key="pref_enable_notification_sound"
+            android:title="enable notification sound"
+            android:defaultValue="true">
+
+
+        </SwitchPreference>
+
+        <RingtonePreference
+            android:key="pref_notification_ringtone"
+            android:title="notification ringtone"
+            android:summary="select notification sound"
+            android:ringtoneType="notification"
+            android:dependency="pref_enable_notification_sound">
+
+
+        </RingtonePreference>
+
 
     </PreferenceCategory>
-
 
 
 

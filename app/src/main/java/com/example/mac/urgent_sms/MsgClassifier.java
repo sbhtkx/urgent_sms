@@ -14,11 +14,6 @@ import java.util.StringTokenizer;
 import android.util.Log;
 import android.widget.Toast;
 
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.ling.HasWord;
-import edu.stanford.nlp.process.CoreLabelTokenFactory;
-import edu.stanford.nlp.process.DocumentPreprocessor;
-import edu.stanford.nlp.process.PTBTokenizer;
 
 
 
@@ -46,8 +41,6 @@ public class MsgClassifier {
     }
 
     public boolean isUrgent(String msg, ArrayList<Contact> contacts,ArrayList<Word> words){
-
-        
 
         int[] w= wm.stringToVector(msg);
         float[][] x = new float[1][w.length];
