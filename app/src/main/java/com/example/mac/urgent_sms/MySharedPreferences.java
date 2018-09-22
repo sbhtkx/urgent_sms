@@ -11,6 +11,8 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
+import static com.facebook.FacebookSdk.getApplicationContext;
+
 /**
  * Created by Mac on 17/09/2018.
  */
@@ -133,6 +135,67 @@ public class MySharedPreferences {
             return false;
         }
     }
+
+    public void setAutoReplyState(boolean enable, Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor  = prefs.edit();
+        editor.putString("enable auto reply",""+enable);
+        editor.apply();
+    }
+
+    public boolean getAutoReplyState(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String state = prefs.getString("enable auto reply",null);
+        if(state.equals("true")){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public void setAutoReplyList(ArrayList<String> auto_reply, Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor  = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(auto_reply);
+        editor.putString("auto replies",json);
+        editor.apply();
+    }
+
+    public ArrayList<String> getAutoReplyList(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Gson gson = new Gson();
+        String json = prefs.getString("auto replies",null);
+        Type type = new TypeToken<ArrayList<String>>(){}.getType();
+        if(gson.fromJson(json, type) == null){
+            ArrayList<String> temp = new ArrayList<String>();
+            temp.add(getApplicationContext().getResources().getString(R.string.automatic_reply_1));
+            temp.add(getApplicationContext().getResources().getString(R.string.automatic_reply_2));
+            temp.add(getApplicationContext().getResources().getString(R.string.automatic_reply_3));
+            temp.add(getApplicationContext().getResources().getString(R.string.automatic_reply_4));
+            setAutoReplyList(temp,getApplicationContext());
+            return temp;
+        }
+        else{
+            return gson.fromJson(json, type);
+
+        }
+    }
+
+    public void setAutoReply(String auto_reply, Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor  = prefs.edit();
+        editor.putString("auto reply",auto_reply);
+        editor.apply();
+    }
+
+    public String getAutoReply(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString("auto reply",null);
+
+    }
+
 
 
 }

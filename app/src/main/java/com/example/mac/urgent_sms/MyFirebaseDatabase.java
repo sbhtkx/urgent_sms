@@ -1,5 +1,7 @@
 package com.example.mac.urgent_sms;
 
+import android.util.Log;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -58,7 +60,7 @@ public class MyFirebaseDatabase implements MyDatabase {
 
     @Override
     public void getSwitchState(final MyCallback<String> callback) {
-        database.child("users").child(getUserId()).child("switch state").addValueEventListener(new ValueEventListener() {
+        database.child("tensorflow").child("versions").child("b1").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 callback.onSuccess(dataSnapshot.getValue().toString());

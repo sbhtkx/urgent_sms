@@ -1,6 +1,23 @@
 package com.example.mac.urgent_sms;
 
+
+
+import android.content.res.AssetManager;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+>>>>>>> 47a51a7186d38df34ac4887721e012dd3932f93a
 import android.util.Log;
+import android.widget.Toast;
+
+
 
 public class MsgClassifier {
 
@@ -24,10 +41,11 @@ public class MsgClassifier {
             b2 = dm.loadDoubleFromInternalStorage("b2.data");
         }catch(Exception e){
         }
-        threshold = 0.8;
+        threshold = 0.5;
     }
 
-    public boolean isUrgent(String msg){
+    public boolean isUrgent(String msg, ArrayList<Contact> contacts,ArrayList<Word> words){
+
         int[] w= wm.stringToVector(msg);
         double[][] x = new double[1][w.length];
         for(int i = 0; i < x[0].length; i++){
@@ -39,7 +57,11 @@ public class MsgClassifier {
         double[][] activation1 = matRelu(z1);
         double z2 = matMul(activation1,w2)[0][0] + b2;
         double y = 1 / (1 + Math.exp(-z2));
+
         Log.d("msgc1",Double.toString(y));
+
+        Log.d("ans",""+y);
+
         return y > threshold;
     }
 
@@ -88,4 +110,12 @@ public class MsgClassifier {
         }
         return B;
     }
+
+
 }
+
+
+
+
+}
+

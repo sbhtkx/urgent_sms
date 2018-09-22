@@ -27,6 +27,21 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         intent_main = new Intent(this,MainActivity.class);
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         auth = FirebaseAuth.getInstance();
         if(auth.getCurrentUser()!=null){
             //user already signed in

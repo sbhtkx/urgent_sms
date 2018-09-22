@@ -33,9 +33,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.android.support:design:26.1.0'
-
     implementation 'com.android.support:support-annotations:27.1.1'
-
     //compile 'com.google.firebase:firebase-core:11.0.4'
     //compile 'com.firebaseui:firebase-ui-auth:2.3.0'
     //authentication via google/facebook
@@ -47,11 +45,8 @@ dependencies {
     compile 'com.google.firebase:firebase-database:9.4.0'
     compile 'com.firebaseui:firebase-ui:0.4.4'
     compile 'com.google.android.gms:play-services-auth:9.4.0'
-
     implementation 'com.google.code.gson:gson:2.8.2'
     compile 'com.squareup.picasso:picasso:2.5.2'
-
-
 }
 
 apply plugin: 'com.google.gms.google-services'
