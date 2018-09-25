@@ -337,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 Toast.makeText(this, "Permission GRANTED", Toast.LENGTH_SHORT).show();
                 enable_switch.setChecked(true);
-                sharedPrefs.setSwitchState(true,getApplication());
+                sharedPrefs.setSwitchState(true, getApplication());
 
 
             }
@@ -381,8 +381,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Uri uri = Uri.fromFile(yourFile);
         MediaPlayer mp = MediaPlayer.create(getApplication(), uri);
 
-//        AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-//        audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+        AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+        audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
         mp.start();
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
