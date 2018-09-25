@@ -228,10 +228,20 @@ public class MySharedPreferences {
         }
     }
 
+
     public String getRingtoneLocation(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String location = prefs.getString("pref_notification_ringtone",null);
         return location;
     }
+
+
+
+
+
+
+
+
+
 
 }
