@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static boolean has_do_not_disturb_perm = false;
     private static int READ_SMS_PERMISSION_CODE = 123;
     private MsgClassifier msgClassifier;
-    private AudioManager audioManager;
     private static boolean test = false;
 
 
@@ -111,9 +110,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         welcome.setOnClickListener(this);
         settings.setOnClickListener(this);
 
-        msgClassifier = new MsgClassifier(new WordsManager(getAssets()), getAssets());
-
-        audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+        DataManager dm = DataManager.getInstance(getApplication());
+        msgClassifier = MsgClassifier.getInstance(WordsManager.getInstance(dm),dm,getApplication());
 
         requestDoNotDisturbPermission();
 
@@ -122,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         enable_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
 
             public void onCheckedChanged(CompoundButton button, boolean isChecked){
-
+                AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
                 if(isChecked){
                     sharedPrefs.setSwitchState(true,getApplication());
                     if(has_do_not_disturb_perm) { //maybe need to create this variable as singleton

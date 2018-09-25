@@ -217,7 +217,6 @@ public class MySharedPreferences {
         }
     }
 
-
     public boolean getRingtoneState(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String state = prefs.getString("pref_enable_notification_sound",null);
@@ -229,11 +228,26 @@ public class MySharedPreferences {
         }
     }
 
+<<<<<<< HEAD
+    public boolean getRingtoneState(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String state = prefs.getString("pref_enable_notification_sound",null);
+        if(state.equals("true")){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+=======
+>>>>>>> 486dba97170cc13a20bd6289c61c47f21255c8d0
     public String getRingtoneLocation(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String location = prefs.getString("pref_notification_ringtone",null);
         return location;
     }
+<<<<<<< HEAD
 
 
 
@@ -242,5 +256,7 @@ public class MySharedPreferences {
 
 
 
+=======
+>>>>>>> 486dba97170cc13a20bd6289c61c47f21255c8d0
 
 }

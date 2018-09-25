@@ -1,5 +1,7 @@
 package com.example.mac.urgent_sms;
 
+import com.google.firebase.database.DataSnapshot;
+
 import java.util.ArrayList;
 
 /**
@@ -19,5 +21,8 @@ public interface MyDatabase {
 
     public void setWordList(ArrayList<String> words);
     public void getWordList(MyCallback<ArrayList<String>> callback);
+
+    public void getVersions(MyCallback<DataSnapshot> callback);
+    public void getWeightByName(String name, MyCallback<String> myCallback);
 
 }

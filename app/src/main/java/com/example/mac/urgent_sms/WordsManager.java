@@ -1,40 +1,43 @@
 package com.example.mac.urgent_sms;
 
-import android.content.res.AssetManager;
-
 import android.util.Log;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 public class WordsManager {
 
     private String[] voc;
     private StringTokenizer stk;
+    private static WordsManager instance = null;
+    private DataManager dm;
 
-    public WordsManager(AssetManager am){
-        // initialize the voc (load from file)
-        String text = "";
-        try {
-            InputStream is = am.open("voc.txt");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            text = new String(buffer);
+    private WordsManager(DataManager dm){
+        this.dm = dm;
+        updateVoc();
+    }
 
-        }catch(IOException ex){
-            ex.printStackTrace();
+    public static WordsManager getInstance(DataManager dm) {
+        if (instance == null) {
+            instance = new WordsManager(dm);
         }
-        stk = new StringTokenizer(text,"\n");
-        voc = new String[stk.countTokens()];
-        for(int i = 0; i<voc.length; i++){
-            voc[i] = stk.nextToken().replace("\n","").replace("\r","");
+        return instance;
+    }
+
+    private void updateVoc(){
+        if (voc==null) {
+            try {
+                voc = dm.loadStringArrayFromInternalStorage("vocabulary.data");
+            } catch (Exception e) {
+                Log.d("voc111", "error");
+            }
         }
+
     }
 
     public int[] stringToVector(String str){
+        updateVoc();
         int[] vector = new int[voc.length];
         Set<String> words = new HashSet<>();
         stk = new StringTokenizer(str);
