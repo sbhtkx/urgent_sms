@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -42,6 +43,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     private TextView welcome;
     private ToggleButton enable_switch;
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
     private DrawerLayout drawer;
     private static final int DO_NOT_DISTURB_CODE = 456;
-    private static boolean has_do_not_disturb_perm = false;
+    private static boolean has_do_not_disturb_perm = true;
     private static int PERMISSION_ALL = 123;
     private String[] PERMISSIONS = {
             //Manifest.permission.VIBRATE,
@@ -116,7 +119,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         enable_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
             public void onCheckedChanged(CompoundButton button, boolean isChecked) {
-
+                AudioManager audioManager =
+                        (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
                 if (isChecked) {
                     enable_switch.setChecked(false);
                     if (has_do_not_disturb_perm) {
@@ -125,8 +129,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         else { //permission granted
                             enable_switch.setChecked(true);
-                            AudioManager audioManager =
-                                    (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
                             formerMode = audioManager.getRingerMode();
                             audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
                             SmsReceiver.bindListener(new SmsListener() {
@@ -150,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 else {
                     sharedPrefs.setSwitchState(false, getApplication());
-                    //audioManager.setRingerMode(formerMode);
+                    audioManager.setRingerMode(formerMode);
                 }
 
             }
@@ -280,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !notificationManager.isNotificationPolicyAccessGranted()){
                 Toast.makeText(this, "Do not disturb Permission denied", Toast.LENGTH_SHORT).show();
                 onBackPressed();
-
+                has_do_not_disturb_perm = false;
             }
             else{
                 onBackPressed();
@@ -354,6 +356,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void sendNotification(String msg) {
 
+
+
         // Build the notification
         notification.setSmallIcon(R.drawable.alert);//
         notification.setTicker("Urgent message!");
@@ -370,9 +374,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         nm.notify(uniqueID, notification.build());
 
         // play ringtone
-        MediaPlayer mp = MediaPlayer.create(this, R.raw.short_sms);
-        AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-        audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+//        MediaPlayer mp = MediaPlayer.create(this, R.raw.short_sms);
+        String yourFilePath = "content://media/internal/audio/media/32";
+//        Uri uri =
+        File yourFile = new File( yourFilePath );
+        Uri uri = Uri.fromFile(yourFile);
+        MediaPlayer mp = MediaPlayer.create(getApplication(), uri);
+
+//        AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+//        audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
         mp.start();
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
