@@ -7,6 +7,9 @@ import android.content.SharedPreferences;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -26,11 +29,15 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.SimpleTimeZone;
 
 public class CalendarActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener,
         TimePickerDialog.OnTimeSetListener {
+    private int year, month, day, hour, minute;
     private int day_of_monthFinal, monthFinal, yearFinal, hourFinal, minuteFinal;
     private TextView display;
     private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
@@ -39,59 +46,81 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
     private CustomAdapter customAdapter = new CustomAdapter();
     private static boolean isEdit = false;
     private static int itemToEdit;
-    private static boolean isDeleteMode = false;
-    private static int itemToDelete;
-    private ImageView delete_btn;
-    private ImageView cancel_btn;
+    private Calendar c;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
 
-        delete_btn = (ImageView) findViewById(R.id.delete_btn);
-        cancel_btn = (ImageView) findViewById(R.id.cancel_btn);
-        delete_btn.setVisibility(View.INVISIBLE);
-        cancel_btn.setVisibility(View.INVISIBLE);
-
         listView_alarms = (ListView) findViewById(R.id.listView_alarms);
         final ImageView add_alarm = (ImageView) findViewById(R.id.add_alarm_btn);
 
         dates = sharedPrefs.getDateList(this);
 
+
         listView_alarms.setAdapter(customAdapter);
 
+        registerForContextMenu(listView_alarms);
 
-        listView_alarms.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        add_alarm.setOnClickListener(this);
 
+    }
+
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId() == R.id.listView_alarms) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+            String[] menuItems = getResources().getStringArray(R.array.menu);
+            for(int i=0; i<menuItems.length; i++){
+                menu.add(Menu.NONE,i,i,menuItems[i]);
+            }
+
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item){
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int menuItemIndex = item.getItemId();
+        switch(menuItemIndex){
+            case(0):
+                Toast.makeText(this, "Edit mode", Toast.LENGTH_SHORT).show();
                 isEdit = true;
-                itemToEdit = i;
-                int year = dates.get(i).getYear();
-                int month = dates.get(i).getMonth();
-                int day = dates.get(i).getDayOfMonth();
+                itemToEdit = info.position;
+                year = dates.get(info.position).getYear();
+                month = dates.get(info.position).getMonth();
+                day = dates.get(info.position).getDayOfMonth();
                 DatePickerDialog datePickerDialog = new DatePickerDialog(CalendarActivity.this,CalendarActivity.this,year,month,day);
                 datePickerDialog.show();
+                break;
 
-            }
-        });
+            case(1):
+                dates.remove(info.position);
+                sharedPrefs.setDateList(dates,getApplication());
+                listView_alarms.setAdapter(customAdapter);
+                break;
+        }
 
-        listView_alarms.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                delete_btn.setVisibility(View.VISIBLE);
-                cancel_btn.setVisibility(View.VISIBLE);
-                isDeleteMode = true;
-                itemToDelete = i;
-                return true;
-            }
-        });
+        return true;
+    }
 
-        cancel_btn.setOnClickListener(this);
-        add_alarm.setOnClickListener(this);
-        delete_btn.setOnClickListener(this);
+    @Override
+    public void onClick(View view) {
+        switch(view.getId()){
 
+            case(R.id.add_alarm_btn):
+                isEdit = false;
+                Calendar calendar = Calendar.getInstance();
+                year = calendar.get(Calendar.YEAR);
+                month = calendar.get(Calendar.MONTH);
+                day = calendar.get(Calendar.DAY_OF_MONTH);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(CalendarActivity.this,CalendarActivity.this,year,month,day);
+                datePickerDialog.show();
+                break;
+
+        }
 
     }
 
@@ -103,12 +132,26 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
         monthFinal = i1;
         day_of_monthFinal = i2;
 
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(CalendarActivity.this,CalendarActivity.this,hour,minute, true);
-        timePickerDialog.show();
+        c = Calendar.getInstance();
+        c.set(Calendar.YEAR,yearFinal);
+        c.set(Calendar.MONTH,monthFinal);
+        c.set(Calendar.DAY_OF_MONTH,day_of_monthFinal);
+        if (isSoonerThanToday(c)){
+            Toast.makeText(this, "You cannot select date from the past", Toast.LENGTH_SHORT).show();
+            DatePickerDialog datePickerDialog = new DatePickerDialog(CalendarActivity.this,CalendarActivity.this,year,month,day);
+            datePickerDialog.show();
+        }
+
+        else{
+            Calendar calendar = Calendar.getInstance();
+            hour = calendar.get(Calendar.HOUR_OF_DAY);
+            minute = calendar.get(Calendar.MINUTE);
+            TimePickerDialog timePickerDialog = new TimePickerDialog(CalendarActivity.this,CalendarActivity.this,hour,minute, true);
+            timePickerDialog.show();
+        }
+
+
     }
 
     @Override
@@ -116,51 +159,55 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
         hourFinal = i;
         minuteFinal = i1;
 
-        if(!isEdit){
-            Date date = new Date(yearFinal, monthFinal,day_of_monthFinal, hourFinal, minuteFinal);
-            dates.add(date);
+        c.set(Calendar.HOUR_OF_DAY,hourFinal);
+        c.set(Calendar.MINUTE,minuteFinal);
+        if(isSoonerThanToday(c)){
+            TimePickerDialog timePickerDialog = new TimePickerDialog(CalendarActivity.this,CalendarActivity.this,hour,minute, true);
+            timePickerDialog.show();
+            Toast.makeText(this, "You cannot select time from the past", Toast.LENGTH_SHORT).show();
+
         }
+
         else{
-            dates.get(itemToEdit).setYear(yearFinal);
-            dates.get(itemToEdit).setMonth(monthFinal);
-            dates.get(itemToEdit).setDay(day_of_monthFinal);
-            dates.get(itemToEdit).setHour(hourFinal);
-            dates.get(itemToEdit).setMinute(minuteFinal);
-            isEdit = false;
+            if(!isEdit){
+                Date date = new Date(yearFinal, monthFinal,day_of_monthFinal, hourFinal, minuteFinal);
+                dates.add(date);
+            }
+            else{
+                dates.get(itemToEdit).setYear(yearFinal);
+                dates.get(itemToEdit).setMonth(monthFinal);
+                dates.get(itemToEdit).setDay(day_of_monthFinal);
+                dates.get(itemToEdit).setHour(hourFinal);
+                dates.get(itemToEdit).setMinute(minuteFinal);
+                isEdit = false;
+            }
+            listView_alarms.setAdapter(customAdapter);
+            sharedPrefs.setDateList(dates,this);
         }
-        listView_alarms.setAdapter(customAdapter);
-        sharedPrefs.setDateList(dates,this);
 
 
     }
 
-    @Override
-    public void onClick(View view) {
-        switch(view.getId()){
-            case(R.id.cancel_btn):
-                delete_btn.setVisibility(View.INVISIBLE);
-                cancel_btn.setVisibility(View.INVISIBLE);
-                break;
 
-            case(R.id.add_alarm_btn):
-                isEdit = false;
-                Calendar calendar = Calendar.getInstance();
-                int year = calendar.get(Calendar.YEAR);
-                int month = calendar.get(Calendar.MONTH);
-                int day = calendar.get(Calendar.DAY_OF_MONTH);
-                DatePickerDialog datePickerDialog = new DatePickerDialog(CalendarActivity.this,CalendarActivity.this,year,month,day);
-                datePickerDialog.show();
-                break;
+    private boolean isSoonerThanToday(Calendar c){
+        Calendar calendar_now = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
 
-            case(R.id.delete_btn):
-                delete_btn.setVisibility(View.INVISIBLE);
-                cancel_btn.setVisibility(View.INVISIBLE);
-                dates.remove(itemToDelete);
-                sharedPrefs.setDateList(dates,getApplication());
-                listView_alarms.setAdapter(customAdapter);
-                break;
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        calendar.set(Calendar.YEAR,year);
+        calendar.set(Calendar.MONTH,month);
+        calendar.set(Calendar.DAY_OF_MONTH,day);
+
+
+        if (calendar_now.getTime().after(c.getTime())) {
+            return true;
         }
-
+        else{
+            return false;
+        }
 
 
     }
