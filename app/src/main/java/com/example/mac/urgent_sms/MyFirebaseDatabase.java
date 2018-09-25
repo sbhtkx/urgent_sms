@@ -60,9 +60,11 @@ public class MyFirebaseDatabase implements MyDatabase {
 
     @Override
     public void getSwitchState(final MyCallback<String> callback) {
-        database.child("tensorflow").child("versions").child("b1").addValueEventListener(new ValueEventListener() {
+        Log.d("ekkk","1start getSwitchState()");
+        database.child("users").child(getUserId()).child("switch state").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("ekkk","1inside onDataChange, before callback.omSuccess(), data: "+dataSnapshot.getValue().toString());
                 callback.onSuccess(dataSnapshot.getValue().toString());
             }
 
@@ -74,33 +76,30 @@ public class MyFirebaseDatabase implements MyDatabase {
     }
 
     @Override
-    public void getVersion(final MyCallback<String> callback){
-        //Log.d("updat5","start");
-        database.child("tensorflow").child("versions").child("b1").addValueEventListener(new ValueEventListener() {
+    public void getVersions(final MyCallback<DataSnapshot> callback){
+        database.child("tensorflow").child("versions").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //Log.d("updat5",dataSnapshot.getValue().toString());
-                callback.onSuccess(dataSnapshot.getValue().toString());
+                callback.onSuccess(dataSnapshot);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
     }
 
-
-//    public void bla(){
-//        MyCallback mc = new MyCallback() {
-//            @Override
-//            public void onSuccess(Object data) {
-//
-//            }
-//        };
-//        getSwitchState(mc);
-//    }
-
+    public void getWeightByName(final String name, final MyCallback<String> callback) {
+        database.child("tensorflow").child("data").child(name).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                callback.onSuccess(dataSnapshot.getValue().toString());
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
 
     @Override
     public void setContactList(ArrayList<Contact> contacts) {

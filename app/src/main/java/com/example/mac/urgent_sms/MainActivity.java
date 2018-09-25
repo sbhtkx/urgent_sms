@@ -24,7 +24,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -42,11 +41,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
-
-import android.support.v4.app.NotificationCompat;
-import android.os.Vibrator;
-
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     private TextView welcome;
@@ -70,26 +64,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         //set toolbar
@@ -129,17 +103,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         logout_btn.setOnClickListener(this);
         welcome.setOnClickListener(this);
         settings.setOnClickListener(this);
+//daniel
+        NotificationManager notificationManager =
+                (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !notificationManager.isNotificationPolicyAccessGranted()) {
+            Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+            startActivity(intent);
+        }
+// till here
         //set main switch
         enable_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-            AudioManager audioManager =
-                    (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+
+//            AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
             DataManager dm = new DataManager(getApplicationContext());
-            MsgClassifier msgClassifier = new MsgClassifier(new WordsManager(dm), dm);
-//            MsgClassifier msgClassifier = new MsgClassifier(new WordsManager(getAssets()), getAssets());
+            WordsManager wm = WordsManager.getInstance(dm);
+            MsgClassifier msgClassifier = MsgClassifier.getInstance(wm, dm, getApplication());
 
             public void onCheckedChanged(CompoundButton button, boolean isChecked){
                 if(isChecked){
+
+//                    formerMode = audioManager.getRingerMode();
+                    sharedPrefs.setSwitchState(true,getApplication());
+//                    audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 
                     //checks for permission
                     if(ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED){
@@ -149,38 +135,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     else{ //permission granted
                         enable_switch.setChecked(true);
                         sharedPrefs.setSwitchState(true,getApplication());
-                        SmsReceiver.bindListener(new SmsListener() {
-                            @Override
-                            public void messageReceived(String messageText, String sender) {
-
-                                //msg_text.setText(messageText);
-                                //sender_txt.setText(sender);
-
-                            }
-                        });
+//                        SmsReceiver.bindListener(new SmsListener() {
+//                            @Override
+//                            public void messageReceived(String messageText, String sender) {
+//
+//                                if(msgClassifier.isUrgent(messageText,null,null)){
+//                                    sendNotification(messageText);
+//                                }
+//                                else{
+//                                    SendSMS sendSMS = new SendSMS(sender,messageText);
+//                                    sendSMS.sendMsg();
+//                                }
+//                            }
+//                        });
                     }
 
-
-                    formerMode = audioManager.getRingerMode();
-                    sharedPrefs.setSwitchState(true,getApplication());
-                    audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                    SmsReceiver.bindListener(new SmsListener() {
-                        @Override
-                        public void messageReceived(String messageText, String sender) {
-                            if(msgClassifier.isUrgent(messageText,null,null)){
-                                sendNotification(messageText);
-                            }
-                            else{
-                                SendSMS sendSMS = new SendSMS(sender,messageText);
-                                sendSMS.sendMsg();
-                            }
-                            //sendNotification(messageText);  // just for testing!!! delete!!!
-                        }
-                    });
                 }
                 else{
                     sharedPrefs.setSwitchState(false,getApplication());
-                    audioManager.setRingerMode(formerMode);
+//                    audioManager.setRingerMode(formerMode);
                 }
 
             }
@@ -324,6 +297,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void sendNotification(String msg){
+
+              /*  NotificationManager notificationManager =
+                (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && !notificationManager.isNotificationPolicyAccessGranted()) {
+
+            Intent intent = new Intent(
+                    android.provider.Settings
+                            .ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+
+            startActivity(intent);
+        }*/
+
+
 
         // Build the notification
         notification.setSmallIcon(R.drawable.alert);//

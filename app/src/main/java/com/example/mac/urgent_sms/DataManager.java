@@ -4,10 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -25,18 +23,16 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class DataManager {
 
-    private DatabaseReference databaseRef, dataRef, versionsRef;
+    private DatabaseReference databaseRef;
     private Context ctx;
     private Map<String,String> currentVersions, newVersions;
-    private Set<String> dataNames;  // the names of the data in firebase: w1, vocabulary etc.
+    private Set<String> dataNames;  // the names of the data in firebase: "w1", "vocabulary" etc.
     private MyDatabase fb;
 
 
     public DataManager(Context ctx){
         dataNames = new HashSet<>(Arrays.asList("b1","b2","w1","w2","vocabulary"));
         databaseRef = FirebaseDatabase.getInstance().getReference();
-        dataRef = databaseRef.child("tensorflow_data").child("data");
-        versionsRef = databaseRef.child("tensorflow_data").child("versions");
         this.ctx = ctx;
         fb = MyFirebaseDatabase.getInstance();
 
@@ -57,45 +53,30 @@ public class DataManager {
         }
 
         checkVersionsAndUpdateFiles();
-
     }
 
     private void checkVersionsAndUpdateFiles(){
         // get new versions from firebase
-        for(final String name : dataNames){
-            fb.getVersion(new MyCallback<String>() {
-                @Override
-                public void onSuccess(String data) {
-                    newVersions.put(name, data);
+
+        fb.getVersions( new MyCallback<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot data) {
+                for(String name : dataNames){
+                    newVersions.put(name,data.child(name).getValue().toString());
                 }
-            });
-        }
-        // check which data need to be updated and update
-        for (String name : dataNames) {
-            Log.d("updat1",name+"- old: "+currentVersions.get(name)+", new: "+newVersions.get(name));
-            if(!currentVersions.get(name).equals(newVersions.get(name))){
-                fetchDataFromFirebaseAndWriteToInternalStorage(dataRef.child(name), name+".data");
-                fetchDataFromFirebaseAndWriteToInternalStorage(versionsRef.child(name),name+".version");
-            }
-        }
-
-    }
-
-
-    private void fetchDataFromFirebaseAndWriteToInternalStorage(DatabaseReference dbref,final String fileName) {
-        final MyCallback<String> callback = new MyCallback<String>() {
-            @Override
-            public void onSuccess(String data) {
-                writeToInternalStorageFile(ctx, fileName, data);
-            }
-        };
-        dbref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                callback.onSuccess(dataSnapshot.getValue().toString());
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                // check which data need to be updated and update
+                for (final String name : dataNames) {
+                    if(!currentVersions.get(name).equals(newVersions.get(name))){
+                        fb.getWeightByName(name, new MyCallback<String>() {
+                                    @Override
+                                    public void onSuccess(String data) {
+                                        writeToInternalStorageFile(ctx, name+".data", data);
+                                        writeToInternalStorageFile(ctx,name+".version",newVersions.get(name));
+                                    }
+                                }
+                        );
+                    }
+                }
             }
         });
     }
@@ -110,6 +91,7 @@ public class DataManager {
 
         }
     }
+
 
     // throws IOException if file doesn't exist
     private String readFromInternalStorageFile(Context ctx, String fileName) throws IOException{

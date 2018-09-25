@@ -11,16 +11,36 @@ public class WordsManager {
 
     private String[] voc;
     private StringTokenizer stk;
+    private static WordsManager instance = null;
+    private DataManager dm;
 
-    public WordsManager(DataManager dm){
-        try {
-            voc = dm.loadStringArrayFromInternalStorage("vocabulary.data");
-            Log.d("voc111", Arrays.toString(voc));
-        }catch(Exception e){
+    private WordsManager(DataManager dm){
+        this.dm = dm;
+        updateVoc();
+    }
+
+    public static WordsManager getInstance(DataManager dm) {
+        if (instance == null) {
+            instance = new WordsManager(dm);
         }
+        return instance;
+    }
+
+    private void updateVoc(){
+        if (voc==null) {
+            try {
+                voc = dm.loadStringArrayFromInternalStorage("vocabulary.data");
+                Log.d("voc111", "start");
+                Log.d("voc111", Arrays.toString(voc));
+            } catch (Exception e) {
+                Log.d("voc111", "error");
+            }
+        }
+
     }
 
     public int[] stringToVector(String str){
+        updateVoc();
         int[] vector = new int[voc.length];
         Set<String> words = new HashSet<>();
         stk = new StringTokenizer(str);
