@@ -116,14 +116,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".EditAlarmActivity"
-            android:label="Edit">
-            <intent-filter>
-                <action android:name="com.example.mac.urgent_sms.EditAlarmActivity" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>

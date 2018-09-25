@@ -29,6 +29,11 @@
     <string name="automatic_reply_3">I am in a meeting, will contact you later</string>
     <string name="automatic_reply_4">This is an automatic reply. \nI am in a meeting, will contact you later</string>
 
+    <string-array name="menu">
+        <item>Edit</item>
+        <item>Delete</item>
+    </string-array>
+
 
     <string name="our_mail">urgentsms.contactus@gmail.com</string>
 
