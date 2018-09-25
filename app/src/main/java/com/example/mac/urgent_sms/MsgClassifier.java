@@ -59,7 +59,6 @@ public class MsgClassifier {
 
         Log.d("msgc1",Double.toString(y));
 
-        Log.d("ans",""+y);
         Toast.makeText(ctx, msg+": "+Double.toString(y), Toast.LENGTH_LONG).show();
 
         return y > threshold;

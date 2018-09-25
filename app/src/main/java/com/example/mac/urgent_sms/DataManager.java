@@ -23,6 +23,8 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class DataManager {
 
+    private static DataManager instance = null;
+
     private DatabaseReference databaseRef;
     private Context ctx;
     private Map<String,String> currentVersions, newVersions;
@@ -30,7 +32,7 @@ public class DataManager {
     private MyDatabase fb;
 
 
-    public DataManager(Context ctx){
+    private DataManager(Context ctx){
         dataNames = new HashSet<>(Arrays.asList("b1","b2","w1","w2","vocabulary"));
         databaseRef = FirebaseDatabase.getInstance().getReference();
         this.ctx = ctx;
@@ -53,6 +55,13 @@ public class DataManager {
         }
 
         checkVersionsAndUpdateFiles();
+    }
+
+    public static DataManager getInstance(Context ctx) {
+        if (instance == null){
+            instance = new DataManager(ctx);
+        }
+        return instance;
     }
 
     private void checkVersionsAndUpdateFiles(){

@@ -18,7 +18,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -42,11 +41,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
-
-import android.support.v4.app.NotificationCompat;
-import android.os.Vibrator;
-
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     private TextView welcome;
@@ -113,8 +107,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         welcome.setOnClickListener(this);
         settings.setOnClickListener(this);
 
-        DataManager dm = new DataManager(getApplication());
-
+        DataManager dm = DataManager.getInstance(getApplication());
         msgClassifier = MsgClassifier.getInstance(WordsManager.getInstance(dm), dm, getApplication());
         requestDoNotDisturbPermission();
 
@@ -139,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             SmsReceiver.bindListener(new SmsListener() {
                                 @Override
                                 public void messageReceived(String messageText, String sender) {
+                                    Log.d("msgc1","start");
                                     if (msgClassifier.isUrgent(messageText, null, null)) {
                                         sendNotification(messageText);
                                     } else {

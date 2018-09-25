@@ -2,7 +2,6 @@ package com.example.mac.urgent_sms;
 
 import android.util.Log;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -30,8 +29,6 @@ public class WordsManager {
         if (voc==null) {
             try {
                 voc = dm.loadStringArrayFromInternalStorage("vocabulary.data");
-                Log.d("voc111", "start");
-                Log.d("voc111", Arrays.toString(voc));
             } catch (Exception e) {
                 Log.d("voc111", "error");
             }
