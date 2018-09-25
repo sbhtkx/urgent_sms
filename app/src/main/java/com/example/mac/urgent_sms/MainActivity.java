@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -57,13 +58,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private DrawerLayout drawer;
     private static final int DO_NOT_DISTURB_CODE = 456;
     private static boolean has_do_not_disturb_perm = false;
-    private static int PERMISSION_ALL = 123;
-    private String[] PERMISSIONS = {
-            //Manifest.permission.VIBRATE,
-            //Manifest.permission.MODIFY_AUDIO_SETTINGS,
-            Manifest.permission.READ_SMS
-    };
+    private static int READ_SMS_PERMISSION_CODE = 123;
     private MsgClassifier msgClassifier;
+    private AudioManager audioManager;
+    private static boolean test = false;
 
 
     NotificationCompat.Builder notification;  // daniel
@@ -114,6 +112,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         settings.setOnClickListener(this);
 
         msgClassifier = new MsgClassifier(new WordsManager(getAssets()), getAssets());
+
+        audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+
         requestDoNotDisturbPermission();
 
 
@@ -123,38 +124,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onCheckedChanged(CompoundButton button, boolean isChecked){
 
                 if(isChecked){
-                    enable_switch.setChecked(false);
-                    if(has_do_not_disturb_perm) {
-                        if (!hasPermissions(getApplication(), PERMISSIONS)) { //checkSelfPermission
-                            requestAllPermission();
+                    sharedPrefs.setSwitchState(true,getApplication());
+                    if(has_do_not_disturb_perm) { //maybe need to create this variable as singleton
+                        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED){
+                            requestSensSMSPermission();
                         }
-                        else { //permission granted
-                            enable_switch.setChecked(true);
-                            AudioManager audioManager =
-                                    (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+                        else{ //permission granted
+                            Toast.makeText(MainActivity.this, "else", Toast.LENGTH_SHORT).show();
                             formerMode = audioManager.getRingerMode();
                             audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
                             SmsReceiver.bindListener(new SmsListener() {
                                 @Override
                                 public void messageReceived(String messageText, String sender) {
                                     if (msgClassifier.isUrgent(messageText, null, null)) {
-                                        //sendNotification(messageText);
+                                        sendNotification(messageText);
                                     } else {
                                         SendSMS sendSMS = new SendSMS(sender, messageText);
                                         sendSMS.sendMsg();
                                     }
-
                                 }
                             });
+
                         }
+
                     }
                     else{
                         requestDoNotDisturbPermission();
                     }
                 }
-                else{
+                else{ //!isChecked
                     sharedPrefs.setSwitchState(false,getApplication());
-                    //audioManager.setRingerMode(formerMode);
+                    audioManager.setRingerMode(formerMode);
                 }
 
             }
@@ -282,40 +282,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             NotificationManager notificationManager =
                     (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !notificationManager.isNotificationPolicyAccessGranted()){
-                Toast.makeText(this, "Do not disturb Permission denied", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Do not disturb Permission denied", Toast.LENGTH_SHORT).show();
                 onBackPressed();
 
             }
             else{
                 onBackPressed();
                 has_do_not_disturb_perm = true;
-                Toast.makeText(this, "Do not disturb Permission given", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Do not disturb Permission GRANTED", Toast.LENGTH_SHORT).show();
             }
 
         }
     }
 
-    public static boolean hasPermissions(Context context, String... permissions) {
-        if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-
-    private void requestAllPermission(){
-        if( (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_SMS))  ){
+    private void requestSensSMSPermission(){
+        enable_switch.setChecked(false);
+        sharedPrefs.setSwitchState(false,this);
+        if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_SMS)){
             new AlertDialog.Builder(this)
-                    .setTitle("Permission needed").setMessage("This permission is needed in order to use this app")
+                    .setTitle("Permission needed").setMessage("This permission is needed in order to send automatic reply")
                     .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            ActivityCompat.requestPermissions(MainActivity.this,PERMISSIONS,PERMISSION_ALL);
-
+                            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_SMS},READ_SMS_PERMISSION_CODE);
                         }
                     })
                     .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -327,32 +316,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
         else{
-            ActivityCompat.requestPermissions(this,PERMISSIONS,PERMISSION_ALL);
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_SMS},READ_SMS_PERMISSION_CODE);
         }
-    }
 
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == PERMISSION_ALL){
-            if( (grantResults.length > 0) && (grantResults[0]==PackageManager.PERMISSION_GRANTED) ){
-
-                Toast.makeText(this, "Permission GRANTED", Toast.LENGTH_SHORT).show();
+        if(requestCode == READ_SMS_PERMISSION_CODE){
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 enable_switch.setChecked(true);
-                sharedPrefs.setSwitchState(true,getApplication());
-
+                sharedPrefs.setSwitchState(true,this);
+                Toast.makeText(this, "READ SMS Permission GRANTED", Toast.LENGTH_SHORT).show();
 
             }
             else{
-                Toast.makeText(this, "Permission DENIED", Toast.LENGTH_SHORT).show();
-                enable_switch.setChecked(false);
-                sharedPrefs.setSwitchState(false,getApplication());
-
+                Toast.makeText(this, "READ SMS Permission DENIED", Toast.LENGTH_SHORT).show();
 
             }
         }
     }
-
 
 
 
