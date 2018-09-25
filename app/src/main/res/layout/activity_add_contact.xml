@@ -10,7 +10,7 @@
         android:id="@+id/rBtn_contact_urgency_level"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="55dp"
         android:layout_marginLeft="60dp"
 
         >
@@ -45,6 +45,16 @@
             android:textColor="@color/redColor"
             android:fontFamily="@font/aclonica"
 
+            />
+
+        <RadioButton
+            android:id="@+id/rBtn_contact_level4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="always urgent"
+            android:textColor="@color/blueColor"
+            android:fontFamily="@font/aclonica"
+            android:tooltipText="SMS from this contact will always make sound"
             />
 
 

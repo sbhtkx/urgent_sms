@@ -44,6 +44,23 @@
 
         </Preference>
 
+        <CheckBoxPreference
+            android:key="enable_timer"
+            android:title="enable Date and Time">
+
+        </CheckBoxPreference>
+
+        <PreferenceScreen
+            android:title="set Date and Time"
+            android:summary="specific time in which the app will be enabled"
+            android:dependency="enable_timer">
+
+            <intent android:action="com.example.mac.urgent_sms.CalendarActivity">
+            </intent>
+
+        </PreferenceScreen>
+
+
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -62,10 +79,13 @@
             android:title="notification ringtone"
             android:summary="select notification sound"
             android:ringtoneType="notification"
-            android:dependency="pref_enable_notification_sound">
+            android:dependency="pref_enable_notification_sound"
+            android:defaultValue="content://settings/system/notification_sound">
 
 
         </RingtonePreference>
+
+
 
 
     </PreferenceCategory>

@@ -1,7 +1,6 @@
 package com.example.mac.urgent_sms;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
@@ -10,8 +9,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-
-import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
  * Created by Mac on 17/09/2018.
@@ -170,11 +167,11 @@ public class MySharedPreferences {
         Type type = new TypeToken<ArrayList<String>>(){}.getType();
         if(gson.fromJson(json, type) == null){
             ArrayList<String> temp = new ArrayList<String>();
-            temp.add(getApplicationContext().getResources().getString(R.string.automatic_reply_1));
-            temp.add(getApplicationContext().getResources().getString(R.string.automatic_reply_2));
-            temp.add(getApplicationContext().getResources().getString(R.string.automatic_reply_3));
-            temp.add(getApplicationContext().getResources().getString(R.string.automatic_reply_4));
-            setAutoReplyList(temp,getApplicationContext());
+            temp.add(context.getResources().getString(R.string.automatic_reply_1));
+            temp.add(context.getResources().getString(R.string.automatic_reply_2));
+            temp.add(context.getResources().getString(R.string.automatic_reply_3));
+            temp.add(context.getResources().getString(R.string.automatic_reply_4));
+            setAutoReplyList(temp,context);
             return temp;
         }
         else{
@@ -194,6 +191,30 @@ public class MySharedPreferences {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getString("auto reply",null);
 
+    }
+
+    public void setDateList(ArrayList<Date> dates, Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor  = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(dates);
+        editor.putString("dates",json);
+        editor.apply();
+    }
+
+    public ArrayList<Date> getDateList(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Gson gson = new Gson();
+        String json = prefs.getString("dates",null);
+        Type type = new TypeToken<ArrayList<Date>>(){}.getType();
+        if(gson.fromJson(json, type) == null){
+            return new ArrayList<Date>();
+
+        }
+        else{
+            return gson.fromJson(json, type);
+
+        }
     }
 
 

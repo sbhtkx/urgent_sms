@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
@@ -90,23 +91,38 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".AboutActivity"
+        <activity
+            android:name=".AboutActivity"
             android:label="About">
             <intent-filter>
                 <action android:name="com.example.mac.urgent_sms.AboutActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
         </activity>
-        <activity android:name=".ContactUsActivity"
+        <activity
+            android:name=".ContactUsActivity"
             android:label="Contact us">
             <intent-filter>
                 <action android:name="com.example.mac.urgent_sms.ContactUsActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </activity>
+        <activity android:name=".CalendarActivity">
+            <intent-filter>
+                <action android:name="com.example.mac.urgent_sms.CalendarActivity" />
 
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".EditAlarmActivity"
+            android:label="Edit">
+            <intent-filter>
+                <action android:name="com.example.mac.urgent_sms.EditAlarmActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
     </application>
 

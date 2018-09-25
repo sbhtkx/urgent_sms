@@ -30,6 +30,9 @@
     <string name="automatic_reply_4">This is an automatic reply. \nI am in a meeting, will contact you later</string>
 
 
+    <string name="our_mail">urgentsms.contactus@gmail.com</string>
+
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_navigation_bar">NavigationBarActivity</string>
