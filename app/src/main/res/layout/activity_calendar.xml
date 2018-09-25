@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.mac.urgent_sms.CalendarActivity"
+    >
+
+
+    <ListView
+        android:id="@+id/listView_alarms"
+        android:layout_width="wrap_content"
+        android:layout_height="510dp"
+        android:layout_marginTop="60dp"
+       >
+
+
+    </ListView>
+
+    <ImageView
+        android:id="@+id/add_alarm_btn"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="320dp"
+        android:background="@drawable/add_circle"
+        />
+
+    <ImageView
+        android:id="@+id/delete_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/ic_delete"/>
+
+    <ImageView
+        android:id="@+id/cancel_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="50dp"
+        android:background="@drawable/ic_clear"/>
+
+
+
+
+
+</RelativeLayout>

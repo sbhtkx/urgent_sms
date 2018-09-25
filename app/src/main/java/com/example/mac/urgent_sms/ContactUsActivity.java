@@ -50,7 +50,7 @@ public class ContactUsActivity extends AppCompatActivity implements View.OnClick
             intent.putExtra(Intent.EXTRA_TEXT,message_body);
 
             intent.setType("message/rfc822");
-            startActivity(Intent.createChooser(intent,"Select Email app"));
+            startActivity(Intent.createChooser(intent,"Select Email clienthg"));
         }
 
 

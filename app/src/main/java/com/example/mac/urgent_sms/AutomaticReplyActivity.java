@@ -67,7 +67,7 @@ public class AutomaticReplyActivity extends AppCompatActivity implements View.On
 
         //set margins of radioGroup
         RelativeLayout.LayoutParams param = new RelativeLayout.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT, RadioGroup.LayoutParams.WRAP_CONTENT);
-        param.setMargins(10,120,40,30);
+        param.setMargins(10,130,40,30);
         radioGroup.setLayoutParams(param);
 
         //add radioButtons into radioGroup
