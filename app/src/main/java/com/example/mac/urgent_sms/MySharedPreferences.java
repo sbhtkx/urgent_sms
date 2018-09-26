@@ -54,14 +54,14 @@ public class MySharedPreferences {
         SharedPreferences.Editor editor  = prefs.edit();
         Gson gson = new Gson();
         String json = gson.toJson(urgent_contacts);
-        editor.putString("urgent contacts",json);
+        editor.putString("prefs_urgent_contacts",json);
         editor.apply();
     }
 
     public ArrayList<Contact> getContactList(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         Gson gson = new Gson();
-        String json = prefs.getString("urgent contacts",null);
+        String json = prefs.getString("prefs_urgent_contacts",null);
         Type type = new TypeToken<ArrayList<Contact>>(){}.getType();
         if(gson.fromJson(json, type) == null){
             return new ArrayList<Contact>();
@@ -78,14 +78,14 @@ public class MySharedPreferences {
         SharedPreferences.Editor editor  = prefs.edit();
         Gson gson = new Gson();
         String json = gson.toJson(urgent_words);
-        editor.putString("urgent words",json);
+        editor.putString("prefs_urgent_words",json);
         editor.apply();
     }
 
     public ArrayList<Word> getUrgentWordsList(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         Gson gson = new Gson();
-        String json = prefs.getString("urgent words",null);
+        String json = prefs.getString("prefs_urgent_words",null);
         Type type = new TypeToken<ArrayList<Word>>(){}.getType();
         if(gson.fromJson(json, type) == null){
             return new ArrayList<Word>();
@@ -100,13 +100,13 @@ public class MySharedPreferences {
     public void setContactsState(boolean enable, Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor  = prefs.edit();
-        editor.putString("enable contacts",""+enable);
+        editor.putString("prefs_enable_contacts",""+enable);
         editor.apply();
     }
 
     public boolean getContactsState(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String state = prefs.getString("enable contacts",null);
+        String state = prefs.getString("prefs_enable_contacts",null);
         if(state.equals("true")){
             return true;
         }
@@ -118,13 +118,13 @@ public class MySharedPreferences {
     public void setWordsState(boolean enable, Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor  = prefs.edit();
-        editor.putString("enable words",""+enable);
+        editor.putString("prefs_enable_words",""+enable);
         editor.apply();
     }
 
     public boolean getWordsState(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String state = prefs.getString("enable words",null);
+        String state = prefs.getString("prefs_enable words",null);
         if(state.equals("true")){
             return true;
         }
@@ -136,19 +136,14 @@ public class MySharedPreferences {
     public void setAutoReplyState(boolean enable, Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor  = prefs.edit();
-        editor.putString("enable auto reply",""+enable);
+        editor.putString("prefs_enable_auto_reply",""+enable);
         editor.apply();
     }
 
     public boolean getAutoReplyState(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String state = prefs.getString("enable auto reply",null);
-        if(state.equals("true")){
-            return true;
-        }
-        else{
-            return false;
-        }
+        boolean state = prefs.getBoolean("prefs_enable_auto_reply",false);
+        return state;
     }
 
     public void setAutoReplyList(ArrayList<String> auto_reply, Context context){
@@ -156,14 +151,14 @@ public class MySharedPreferences {
         SharedPreferences.Editor editor  = prefs.edit();
         Gson gson = new Gson();
         String json = gson.toJson(auto_reply);
-        editor.putString("auto replies",json);
+        editor.putString("prefs_auto_reply_list",json);
         editor.apply();
     }
 
     public ArrayList<String> getAutoReplyList(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         Gson gson = new Gson();
-        String json = prefs.getString("auto replies",null);
+        String json = prefs.getString("prefs_auto_reply_list",null);
         Type type = new TypeToken<ArrayList<String>>(){}.getType();
         if(gson.fromJson(json, type) == null){
             ArrayList<String> temp = new ArrayList<String>();
@@ -183,29 +178,48 @@ public class MySharedPreferences {
     public void setAutoReply(String auto_reply, Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor  = prefs.edit();
-        editor.putString("auto reply",auto_reply);
+        editor.putString("prefs_auto_reply",auto_reply);
         editor.apply();
     }
 
     public String getAutoReply(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString("auto reply",null);
+        return prefs.getString("prefs_auto_reply",null);
 
     }
 
-    public void setDateList(ArrayList<Date> dates, Context context){
+    public void setTimerState(boolean enable, Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor  = prefs.edit();
+        editor.putString("prefs_enable_timer",""+enable);
+        editor.apply();
+    }
+
+    public boolean getTimerState(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String state = prefs.getString("prefs_enable_timer",null);
+        if(state.equals("true")){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+
+    public void setTimerList(ArrayList<Date> dates, Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor  = prefs.edit();
         Gson gson = new Gson();
         String json = gson.toJson(dates);
-        editor.putString("dates",json);
+        editor.putString("prefs_timer_list",json);
         editor.apply();
     }
 
-    public ArrayList<Date> getDateList(Context context){
+    public ArrayList<Date> getTimerList(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         Gson gson = new Gson();
-        String json = prefs.getString("dates",null);
+        String json = prefs.getString("prefs_timer_list",null);
         Type type = new TypeToken<ArrayList<Date>>(){}.getType();
         if(gson.fromJson(json, type) == null){
             return new ArrayList<Date>();
@@ -219,29 +233,34 @@ public class MySharedPreferences {
 
     public boolean getRingtoneState(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean b = false;
-        boolean state = prefs.getBoolean("pref_enable_notification_sound", b);
-//        String state = prefs.getString("pref_enable_notification_sound",null);
-        if(state==true){
+        boolean state = prefs.getBoolean("prefs_enable_notification_sound", false);
+        return state;
+    }
+
+
+    public String getRingtoneLocation(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String location = prefs.getString("prefs_notification_sound",null);
+        return location;
+    }
+
+    public void setHasDoNotDisturbPerm(boolean hasPerm, Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor  = prefs.edit();
+        editor.putString("DO NOT DISTURB perm",""+hasPerm);
+        editor.apply();
+    }
+
+    public boolean getHasDoNotDisturbPerm(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String state = prefs.getString("DO NOT DISTURB perm",null);
+        if(state.equals("true")){
             return true;
         }
         else{
             return false;
         }
     }
-
-
-    public String getRingtoneLocation(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String location = prefs.getString("pref_notification_ringtone",null);
-        return location;
-    }
-
-
-
-
-
-
 
 
 

@@ -25,6 +25,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -51,11 +53,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
     private DrawerLayout drawer;
     private static final int DO_NOT_DISTURB_CODE = 456;
-    private static boolean has_do_not_disturb_perm = false;
+//    private static boolean has_do_not_disturb_perm = false;
     private static int READ_SMS_PERMISSION_CODE = 123;
     private MsgClassifier msgClassifier;
-    private static boolean test = false;
-
 
     NotificationCompat.Builder notification;  // daniel
     private static final int uniqueID = 452345245;  // the system needs it to manage notifications
@@ -117,9 +117,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
                 if(isChecked){
                     sharedPrefs.setSwitchState(true,getApplication());
-                    if(has_do_not_disturb_perm) { //maybe need to create this variable as singleton
+                    if(sharedPrefs.getHasDoNotDisturbPerm(getApplication())) {
                         if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED){
-                            requestSensSMSPermission();
+                            requestReadSMSPermission();
                         }
                         else{ //permission granted
                             Toast.makeText(MainActivity.this, "else", Toast.LENGTH_SHORT).show();
@@ -130,9 +130,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 public void messageReceived(String messageText, String sender) {
                                     if (msgClassifier.isUrgent(messageText, null, null)) {
                                         sendNotification(messageText);
-                                    } else {
-                                        SendSMS sendSMS = new SendSMS(sender, messageText);
-                                        sendSMS.sendMsg();
+                                    }
+                                    else {
+                                        if(sharedPrefs.getAutoReplyState(getApplication())){
+//                                          SendSMS sendSMS = new SendSMS(getApplicationContext(),sender, sharedPrefs.getAutoReply(MainActivity.this));
+//                                          sendSMS.sendMsg();
+                                            SmsManager smsManager = SmsManager.getDefault();
+                                            smsManager.sendTextMessage(sender,null,messageText,null,null);
+
+                                        }
+
                                     }
                                 }
                             });
@@ -142,6 +149,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     else{
                         requestDoNotDisturbPermission();
+                        enable_switch.setChecked(false);
+                        sharedPrefs.setSwitchState(false,getApplication());
                     }
                 }
                 else{ //!isChecked
@@ -177,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else{
             enable_switch.setChecked(false);
         }
+
 
     }
 
@@ -262,8 +272,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         NotificationManager notificationManager =
                 (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !notificationManager.isNotificationPolicyAccessGranted()) {
+            sharedPrefs.setHasDoNotDisturbPerm(false,this);
             Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
             startActivityForResult(intent,DO_NOT_DISTURB_CODE);
+            onBackPressed();
+
         }
 
     }
@@ -274,20 +287,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             NotificationManager notificationManager =
                     (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !notificationManager.isNotificationPolicyAccessGranted()){
-                        Toast.makeText(this, "Do not disturb Permission denied", Toast.LENGTH_SHORT).show();
-                onBackPressed();
+                    Toast.makeText(this, "Do not disturb Permission denied", Toast.LENGTH_SHORT).show();
 
             }
             else{
-                onBackPressed();
-                has_do_not_disturb_perm = true;
+                sharedPrefs.setHasDoNotDisturbPerm(true,this);
                 Toast.makeText(this, "Do not disturb Permission GRANTED", Toast.LENGTH_SHORT).show();
             }
 
         }
     }
 
-    private void requestSensSMSPermission(){
+    private void requestReadSMSPermission(){
         enable_switch.setChecked(false);
         sharedPrefs.setSwitchState(false,this);
         if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_SMS)){
@@ -319,10 +330,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 enable_switch.setChecked(true);
                 sharedPrefs.setSwitchState(true,this);
-                Toast.makeText(this, "READ SMS Permission GRANTED", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "SMS Permission GRANTED", Toast.LENGTH_SHORT).show();
             }
             else{
-                Toast.makeText(this, "READ SMS Permission DENIED", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "SMS Permission DENIED", Toast.LENGTH_SHORT).show();
 
             }
         }
@@ -350,6 +361,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        nm.notify(uniqueID, notification.build());
 
         // play ringtone
+//<<<<<<< HEAD
         MySharedPreferences mySharedPreferences = MySharedPreferences.getInstance();
         if(mySharedPreferences.getRingtoneState(this)) {
             String path = mySharedPreferences.getRingtoneLocation(this);
@@ -372,6 +384,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         v.vibrate(500);
                     }
                     audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+//=======
+//        MediaPlayer mp = MediaPlayer.create(this, R.raw.short_sms);
+//        AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+//        audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+//        mp.start();
+//        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//
+//            @Override
+//            public void onCompletion(MediaPlayer mp) {
+//                mp.release();
+//                AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+//                audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+//                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+//                // Vibrate for 500 milliseconds
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                    v.vibrate(VibrationEffect.createOneShot(500,VibrationEffect.DEFAULT_AMPLITUDE));
+//                }else{
+//                    //deprecated in API 26
+//                    v.vibrate(500);
+//>>>>>>> ff6c985c7ad98b036b6c9704158fba4620cb0c05
                 }
 
             });
