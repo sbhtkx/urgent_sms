@@ -106,13 +106,8 @@ public class MySharedPreferences {
 
     public boolean getContactsState(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String state = prefs.getString("prefs_enable_contacts",null);
-        if(state.equals("true")){
-            return true;
-        }
-        else{
-            return false;
-        }
+        boolean state = prefs.getBoolean("prefs_enable_contacts",false);
+        return state;
     }
 
     public void setWordsState(boolean enable, Context context){
@@ -124,13 +119,8 @@ public class MySharedPreferences {
 
     public boolean getWordsState(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String state = prefs.getString("prefs_enable words",null);
-        if(state.equals("true")){
-            return true;
-        }
-        else{
-            return false;
-        }
+        boolean state = prefs.getBoolean("prefs_enable words",false);
+        return state;
     }
 
     public void setAutoReplyState(boolean enable, Context context){
@@ -197,13 +187,8 @@ public class MySharedPreferences {
 
     public boolean getTimerState(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String state = prefs.getString("prefs_enable_timer",null);
-        if(state.equals("true")){
-            return true;
-        }
-        else{
-            return false;
-        }
+        boolean state = prefs.getBoolean("prefs_enable_timer",false);
+        return state;
     }
 
 
@@ -233,13 +218,8 @@ public class MySharedPreferences {
 
     public boolean getRingtoneState(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String state = prefs.getString("prefs_enable_notification_sound",null);
-        if(state.equals("true")){
-            return true;
-        }
-        else{
-            return false;
-        }
+        boolean state = prefs.getBoolean("prefs_enable_notification_sound",false);
+        return state;
     }
 
 
