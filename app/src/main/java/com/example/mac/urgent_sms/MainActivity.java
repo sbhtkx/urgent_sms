@@ -26,7 +26,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -358,10 +357,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Builds notification and issues it
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//        nm.notify(uniqueID, notification.build());
+        nm.notify(uniqueID, notification.build());
 
         // play ringtone
-//<<<<<<< HEAD
         MySharedPreferences mySharedPreferences = MySharedPreferences.getInstance();
         if(mySharedPreferences.getRingtoneState(this)) {
             String path = mySharedPreferences.getRingtoneLocation(this);
@@ -384,26 +382,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         v.vibrate(500);
                     }
                     audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-//=======
-//        MediaPlayer mp = MediaPlayer.create(this, R.raw.short_sms);
-//        AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-//        audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-//        mp.start();
-//        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//
-//            @Override
-//            public void onCompletion(MediaPlayer mp) {
-//                mp.release();
-//                AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-//                audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-//                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-//                // Vibrate for 500 milliseconds
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                    v.vibrate(VibrationEffect.createOneShot(500,VibrationEffect.DEFAULT_AMPLITUDE));
-//                }else{
-//                    //deprecated in API 26
-//                    v.vibrate(500);
-//>>>>>>> ff6c985c7ad98b036b6c9704158fba4620cb0c05
                 }
 
             });
