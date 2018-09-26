@@ -349,8 +349,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         notification.setContentTitle("Urgent message!");
         notification.setContentText(msg);
 
-
-        // build what will happen when user press on notification
+        // build what will happen when user press on the notification
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         notification.setContentIntent(pendingIntent);
