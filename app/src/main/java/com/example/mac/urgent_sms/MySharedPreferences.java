@@ -219,8 +219,10 @@ public class MySharedPreferences {
 
     public boolean getRingtoneState(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String state = prefs.getString("pref_enable_notification_sound",null);
-        if(state.equals("true")){
+        boolean b = false;
+        boolean state = prefs.getBoolean("pref_enable_notification_sound", b);
+//        String state = prefs.getString("pref_enable_notification_sound",null);
+        if(state==true){
             return true;
         }
         else{

@@ -37,6 +37,7 @@ public class WordsManager {
     }
 
     public int[] stringToVector(String str){
+        str = str.toLowerCase();
         updateVoc();
         int[] vector = new int[voc.length];
         Set<String> words = new HashSet<>();

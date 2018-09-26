@@ -43,8 +43,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
-
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     private TextView welcome;
     private ToggleButton enable_switch;
@@ -341,44 +339,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         notification.setContentTitle("Urgent message!");
         notification.setContentText(msg);
 
+
+        // build what will happen when user press on notification
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         notification.setContentIntent(pendingIntent);
 
         // Builds notification and issues it
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        nm.notify(uniqueID, notification.build());
+//        nm.notify(uniqueID, notification.build());
 
         // play ringtone
-//        MediaPlayer mp = MediaPlayer.create(this, R.raw.short_sms);
-        String yourFilePath = "content://media/internal/audio/media/32";
-//        Uri uri =
-        File yourFile = new File( yourFilePath );
-        Uri uri = Uri.fromFile(yourFile);
-        MediaPlayer mp = MediaPlayer.create(getApplication(), uri);
+        MySharedPreferences mySharedPreferences = MySharedPreferences.getInstance();
+        if(mySharedPreferences.getRingtoneState(this)) {
+            String path = mySharedPreferences.getRingtoneLocation(this);
+            Uri uri = Uri.parse(path);
+            MediaPlayer mp = MediaPlayer.create(getApplication(), uri);
+            final AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+            audioManager.setRingerMode(formerMode);
+            mp.start();
+            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
-//        MediaPlayer mp = MediaPlayer.create(this, R.raw.short_sms);
-        AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-        audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-        mp.start();
-        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                mp.release();
-                AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-                audioManager.setRingerMode(formerMode);
-                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                // Vibrate for 500 milliseconds
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    v.vibrate(VibrationEffect.createOneShot(500,VibrationEffect.DEFAULT_AMPLITUDE));
-                }else{
-                    //deprecated in API 26
-                    v.vibrate(500);
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mp.release();
+                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    // Vibrate for 500 milliseconds
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        //deprecated in API 26
+                        v.vibrate(500);
+                    }
+                    audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
                 }
-            }
 
-        });
+            });
+        }
     }
 
 }
