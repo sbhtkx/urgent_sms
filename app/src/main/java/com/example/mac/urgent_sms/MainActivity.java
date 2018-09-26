@@ -26,7 +26,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -44,11 +43,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
-
-import android.support.v4.app.NotificationCompat;
-import android.os.Vibrator;
-
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     private TextView welcome;
@@ -336,7 +330,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 enable_switch.setChecked(true);
                 sharedPrefs.setSwitchState(true,this);
                 Toast.makeText(this, "SMS Permission GRANTED", Toast.LENGTH_SHORT).show();
-
             }
             else{
                 Toast.makeText(this, "SMS Permission DENIED", Toast.LENGTH_SHORT).show();
@@ -356,6 +349,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         notification.setContentTitle("Urgent message!");
         notification.setContentText(msg);
 
+        // build what will happen when user press on the notification
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         notification.setContentIntent(pendingIntent);
@@ -365,28 +359,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         nm.notify(uniqueID, notification.build());
 
         // play ringtone
-        MediaPlayer mp = MediaPlayer.create(this, R.raw.short_sms);
-        AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-        audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-        mp.start();
-        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+        MySharedPreferences mySharedPreferences = MySharedPreferences.getInstance();
+        if(mySharedPreferences.getRingtoneState(this)) {
+            String path = mySharedPreferences.getRingtoneLocation(this);
+            Uri uri = Uri.parse(path);
+            MediaPlayer mp = MediaPlayer.create(getApplication(), uri);
+            final AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+            audioManager.setRingerMode(formerMode);
+            mp.start();
+            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                mp.release();
-                AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-                audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                // Vibrate for 500 milliseconds
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    v.vibrate(VibrationEffect.createOneShot(500,VibrationEffect.DEFAULT_AMPLITUDE));
-                }else{
-                    //deprecated in API 26
-                    v.vibrate(500);
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mp.release();
+                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    // Vibrate for 500 milliseconds
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        //deprecated in API 26
+                        v.vibrate(500);
+                    }
+                    audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
                 }
-            }
 
-        });
+            });
+        }
     }
 
 }

@@ -1,7 +1,6 @@
 package com.example.mac.urgent_sms;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
@@ -163,7 +162,6 @@ public class DataManager {
 
         String content = readFromInternalStorageFile(ctx, fileName);
         content = content.replaceAll("\\s+", "");  // delete blank spaces
-        Log.d("cnt1",content);
 
         StringTokenizer stk = new StringTokenizer(content,"[],");
 

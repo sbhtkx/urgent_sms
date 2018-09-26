@@ -69,7 +69,6 @@ public class MsgClassifier {
         int rowsA = A.length;
         int colsA = A[0].length;
         int colsB = B[0].length;
-        Log.d("eee1","A shape: ["+A.length+","+A[0].length+"]\nB shape: ["+B.length+","+B[0].length+"]");
         //new matrix to hold result
         double[][] C = new double [rowsA][colsB];
         //start across rows of A
