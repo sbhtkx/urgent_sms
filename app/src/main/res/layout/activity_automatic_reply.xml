@@ -27,7 +27,7 @@
             android:id="@+id/add_reply"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="310dp"
+            android:layout_marginLeft="305dp"
             android:layout_marginTop="20dp"
             app:srcCompat="@drawable/ic_add" />
 
@@ -35,7 +35,7 @@
             android:id="@+id/rmv_reply"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="350dp"
+            android:layout_marginLeft="340dp"
             android:layout_marginTop="20dp"
             app:srcCompat="@drawable/ic_delete" />
 

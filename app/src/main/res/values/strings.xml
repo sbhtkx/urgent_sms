@@ -24,16 +24,17 @@
 
     <!--</string-array>-->
 
-    <string name="automatic_reply_1">I am busy right now, will contact you later</string>
-    <string name="automatic_reply_2">This is an automatic reply. \nI am busy right now, will contact you later</string>
-    <string name="automatic_reply_3">I am in a meeting, will contact you later</string>
-    <string name="automatic_reply_4">This is an automatic reply. \nI am in a meeting, will contact you later</string>
+    <string name="automatic_reply_1">This is an automatic reply. \nI am busy right now, will contact you later</string>
+    <string name="automatic_reply_2">I am busy right now, will contact you later</string>
+    <string name="automatic_reply_3">This is an automatic reply. \nI am in a meeting, will contact you later</string>
+    <string name="automatic_reply_4">I am in a meeting, will contact you later</string>
 
     <string-array name="menu">
         <item>Edit</item>
         <item>Delete</item>
     </string-array>
 
+    I am in a meeting, will contact you later
 
     <string name="our_mail">urgentsms.contactus@gmail.com</string>
 

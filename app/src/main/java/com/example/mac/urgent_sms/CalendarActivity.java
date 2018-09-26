@@ -45,7 +45,7 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
         listView_alarms = (ListView) findViewById(R.id.listView_alarms);
         final ImageView add_alarm = (ImageView) findViewById(R.id.add_alarm_btn);
 
-        dates = sharedPrefs.getDateList(this);
+        dates = sharedPrefs.getTimerList(this);
 
 
         listView_alarms.setAdapter(customAdapter);
@@ -86,7 +86,7 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
 
             case(1):
                 dates.remove(info.position);
-                sharedPrefs.setDateList(dates,getApplication());
+                sharedPrefs.setTimerList(dates,getApplication());
                 listView_alarms.setAdapter(customAdapter);
                 break;
         }
@@ -170,7 +170,7 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
                 isEdit = false;
             }
             listView_alarms.setAdapter(customAdapter);
-            sharedPrefs.setDateList(dates,this);
+            sharedPrefs.setTimerList(dates,this);
         }
 
 

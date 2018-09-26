@@ -4,56 +4,57 @@
     <PreferenceCategory
         android:title="General">
         <CheckBoxPreference
-            android:key="enable_contacts"
+            android:key="prefs_enable_contacts"
             android:title="enable urgent contacts">
 
         </CheckBoxPreference>
         <Preference
-            android:key="pref_urgent_contacts"
+            android:key="prefs_urgent_contacts"
             android:title="set urgent contacts"
             android:summary="SMS from urgent contact increases its urgency"
-            android:dependency="enable_contacts">
+            android:dependency="prefs_enable_contacts">
         </Preference>
 
         <CheckBoxPreference
-            android:key="enable_words"
+            android:key="prefs_enable_words"
             android:title="enable urgent words"
             android:defaultValue="true">
 
         </CheckBoxPreference>
 
         <Preference
-            android:key="pref_urgent_words"
+            android:key="prefs_urgent_words"
             android:title="set urgent words"
             android:summary="SMS with urgent word increases its urgency"
-            android:dependency="enable_words">
+            android:dependency="prefs_enable_words">
         </Preference>
 
         <CheckBoxPreference
-            android:key="enable_automatic_reply"
+            android:key="prefs_enable_auto_reply"
             android:title="enable automatic reply">
 
         </CheckBoxPreference>
 
         <Preference
-            android:key="pref_automatic_reply"
+            android:key="prefs_auto_reply"
             android:title="set automatic reply"
             android:summary="send reply message in case of an un-urgent SMS"
-            android:dependency="enable_automatic_reply"
+            android:dependency="prefs_enable_auto_reply"
             >
 
         </Preference>
 
         <CheckBoxPreference
-            android:key="enable_timer"
+            android:key="prefs_enable_timer"
             android:title="enable Date and Time">
 
         </CheckBoxPreference>
 
         <PreferenceScreen
+            android:key="prefs_timer_list"
             android:title="set Date and Time"
             android:summary="specific time in which the app will be enabled"
-            android:dependency="enable_timer">
+            android:dependency="prefs_enable_timer">
 
             <intent android:action="com.example.mac.urgent_sms.CalendarActivity">
             </intent>
@@ -67,7 +68,7 @@
         android:title="Notifications">
 
         <SwitchPreference
-            android:key="pref_enable_notification_sound"
+            android:key="prefs_enable_notification_sound"
             android:title="enable notification sound"
             android:defaultValue="true">
 
@@ -75,11 +76,11 @@
         </SwitchPreference>
 
         <RingtonePreference
-            android:key="pref_notification_ringtone"
+            android:key="prefs_notification_sound"
             android:title="notification ringtone"
             android:summary="select notification sound"
             android:ringtoneType="notification"
-            android:dependency="pref_enable_notification_sound"
+            android:dependency="prefs_enable_notification_sound"
             android:defaultValue="content://settings/system/notification_sound">
 
 

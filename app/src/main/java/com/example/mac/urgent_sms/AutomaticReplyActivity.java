@@ -84,13 +84,8 @@ public class AutomaticReplyActivity extends AppCompatActivity implements View.On
 
         }
         if(sharedPrefs.getAutoReply(this) == null){
-            if(autoReplyList.size() != 0){
-                setRadioBtnChecked(autoReplyList.get(0));
-                sharedPrefs.setAutoReply(autoReplyList.get(0),this);
-            }
-            else{ //if user removes all auto replies
-                sharedPrefs.setAutoReplyState(false,this);
-            }
+            setRadioBtnChecked(autoReplyList.get(0));
+            sharedPrefs.setAutoReply(autoReplyList.get(0),this);
         }
         else{
             setRadioBtnChecked(sharedPrefs.getAutoReply(this));
@@ -123,12 +118,16 @@ public class AutomaticReplyActivity extends AppCompatActivity implements View.On
                     isEdit = true;
                 }
                 else{
+                    int radioBtnId = radioGroup.getCheckedRadioButtonId();
+                    if(removeRadioBtn(radioBtnId)){
+                        showRadioGroup();
+                    }
+                    else{
+                        Toast.makeText(this, "You cannot delete default replies", Toast.LENGTH_SHORT).show();
+                    }
                     rmv_reply.setImageDrawable(getResources().getDrawable(R.drawable.ic_delete));
                     add_reply.setImageDrawable(getResources().getDrawable(R.drawable.ic_add));
                     msg_rmv_reply.setText("");
-                    int radioBtnId = radioGroup.getCheckedRadioButtonId();
-                    removeRadioBtn(radioBtnId);
-                    showRadioGroup();
                     isEdit = false;
                 }
                 break;
@@ -160,14 +159,22 @@ public class AutomaticReplyActivity extends AppCompatActivity implements View.On
 
     }
 
-    private void removeRadioBtn(int radioBtnId){
+    private boolean removeRadioBtn(int radioBtnId){
         RadioButton raddioBtn = findViewById(radioBtnId);
         for(int i=0; i<autoReplyList.size(); i++){
             if(autoReplyList.get(i).equals(raddioBtn.getText())){
-                autoReplyList.remove(i);
-                sharedPrefs.setAutoReplyList(autoReplyList,this);
+                if(i>=0 && i<=3){
+                    return false;
+                }
+                else{
+                    autoReplyList.remove(i);
+                    sharedPrefs.setAutoReplyList(autoReplyList,this);
+                    return true;
+                }
+
             }
         }
+        return false; //will never get here
     }
 
     private void showAddReplyWindow(View view){
@@ -183,9 +190,6 @@ public class AutomaticReplyActivity extends AppCompatActivity implements View.On
                     Toast.makeText(AutomaticReplyActivity.this, "You haven't entered a reply", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    if(radioGroup.getChildCount() == 0){ //if user removes all auto replies, then adds one
-                        sharedPrefs.setAutoReplyState(true,getApplication());
-                    }
                     autoReplyList.add(enter_reply.getText().toString());
                     sharedPrefs.setAutoReplyList(autoReplyList,getApplication());
                     showRadioGroup();
