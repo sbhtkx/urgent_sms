@@ -1,7 +1,11 @@
 package com.example.mac.urgent_sms;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
@@ -47,6 +51,7 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
 
         dates = sharedPrefs.getTimerList(this);
 
+        rmvPastAlarms();
 
         listView_alarms.setAdapter(customAdapter);
 
@@ -88,6 +93,7 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
                 dates.remove(info.position);
                 sharedPrefs.setTimerList(dates,getApplication());
                 listView_alarms.setAdapter(customAdapter);
+                cancelAlarm(info.position);
                 break;
         }
 
@@ -158,8 +164,10 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
 
         else{
             if(!isEdit){
-                Date date = new Date(yearFinal, monthFinal,day_of_monthFinal, hourFinal, minuteFinal);
+                Date date = new Date(c);
+                startAlarm(date);
                 dates.add(date);
+
             }
             else{
                 dates.get(itemToEdit).setYear(yearFinal);
@@ -200,6 +208,48 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
 
     }
 
+
+    private void startAlarm(Date date){
+//        Calendar c = Calendar.getInstance();
+//        c.set(Calendar.DAY_OF_MONTH,date.getDayOfMonth());
+//        c.set(Calendar.MONTH,date.getMonth());
+//        c.set(Calendar.YEAR,date.getYear());
+//        c.set(Calendar.HOUR_OF_DAY,date.getHour());
+//        c.set(Calendar.MINUTE,date.getMinute());
+//        c.set(Calendar.SECOND,0);
+
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlertReceiver.class);
+//        intent.putExtra("id",date.getId());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,date.getId(),intent,0);
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP,date.getCalendar().getTimeInMillis(),pendingIntent);
+
+
+    }
+
+    private void cancelAlarm(int id){
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,id,intent,0);
+
+        alarmManager.cancel(pendingIntent);
+    }
+
+    private void rmvPastAlarms(){
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.SECOND,0);
+        ArrayList<Date> dates_to_remove = new ArrayList<>();
+        for(Date date : dates){
+            if(date.getCalendar().getTimeInMillis() < today.getTimeInMillis()){
+                dates_to_remove.add(date);
+            }
+        }
+        dates.removeAll(dates_to_remove);
+        sharedPrefs.setTimerList(dates,this);
+    }
+
     class CustomAdapter extends BaseAdapter {
 
 
@@ -219,7 +269,7 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
         }
 
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
+        public View getView(final int i, View view, ViewGroup viewGroup) {
             view = getLayoutInflater().inflate(R.layout.one_alarm_from_list,null);
             final TextView hour_txt = (TextView) view.findViewById(R.id.time_txt);
             final TextView date_txt = (TextView) view.findViewById(R.id.date_txt);
@@ -241,16 +291,30 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
             hour_txt.setText(hour_format+":"+minute_format);
             date_txt.setText(date_format);
 
+            isOn.setChecked(dates.get(i).getIsOn());
+
             isOn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if(b){
                         hour_txt.setTextColor(getResources().getColor(R.color.blackColor));
                         date_txt.setTextColor(getResources().getColor(R.color.blackColor));
+                        Date date = dates.get(i);
+                        date.setIsOn(true);
+                        dates.set(i,date);
+                        sharedPrefs.setTimerList(dates,CalendarActivity.this);
+                        startAlarm(date);
+
                     }
                     else{
                         hour_txt.setTextColor(getResources().getColor(R.color.grayColor));
                         date_txt.setTextColor(getResources().getColor(R.color.grayColor));
+                        Date date = dates.get(i);
+                        date.setIsOn(false);
+                        dates.set(i,date);
+                        sharedPrefs.setTimerList(dates,CalendarActivity.this);
+                        cancelAlarm(date.getId());
+
                     }
                 }
             });

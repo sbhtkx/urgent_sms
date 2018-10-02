@@ -1,11 +1,14 @@
 package com.example.mac.urgent_sms;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -15,6 +18,7 @@ import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -26,6 +30,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -44,18 +49,21 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+import java.util.ArrayList;
+import java.util.Calendar;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,
+        NavigationView.OnNavigationItemSelectedListener, SmsListener{
+
     private TextView welcome;
-    private ToggleButton enable_switch;
+    public static ToggleButton enable_switch;
     private Button logout_btn;
     private Button settings;
     private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
     private DrawerLayout drawer;
     private static final int DO_NOT_DISTURB_CODE = 456;
-//    private static boolean has_do_not_disturb_perm = false;
     private static int READ_SMS_PERMISSION_CODE = 123;
     private MsgClassifier msgClassifier;
-
     NotificationCompat.Builder notification;  // daniel
     private static final int uniqueID = 452345245;  // the system needs it to manage notifications
     int formerMode =0;  // the ringer mode to back to on completion of ringtone, need to be a field because i don't know other way to send it to onCompletion()
@@ -107,6 +115,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         msgClassifier = MsgClassifier.getInstance(WordsManager.getInstance(dm),dm,getApplication());
 
         requestDoNotDisturbPermission();
+        //sendSMS(this,"+972542502484","hey yael");
+
+
 
 
         //set main switch
@@ -117,31 +128,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(isChecked){
                     sharedPrefs.setSwitchState(true,getApplication());
                     if(sharedPrefs.getHasDoNotDisturbPerm(getApplication())) {
-                        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED){
-                            requestReadSMSPermission();
+                        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
+                            requestSMSPermission();
                         }
                         else{ //permission granted
+
                             Toast.makeText(MainActivity.this, "else", Toast.LENGTH_SHORT).show();
                             formerMode = audioManager.getRingerMode();
                             audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                            SmsReceiver.bindListener(new SmsListener() {
-                                @Override
-                                public void messageReceived(String messageText, String sender) {
-                                    if (msgClassifier.isUrgent(messageText, null, null)) {
-                                        sendNotification(messageText);
-                                    }
-                                    else {
-                                        if(sharedPrefs.getAutoReplyState(getApplication())){
-//                                          SendSMS sendSMS = new SendSMS(getApplicationContext(),sender, sharedPrefs.getAutoReply(MainActivity.this));
-//                                          sendSMS.sendMsg();
-                                            SmsManager smsManager = SmsManager.getDefault();
-                                            smsManager.sendTextMessage(sender,null,messageText,null,null);
 
-                                        }
 
-                                    }
-                                }
-                            });
+//                            SmsReceiver.bindListener(new SmsListener() {
+//                                @Override
+//                                public void messageReceived(String messageText, String sender) {
+//                                    Toast.makeText(MainActivity.this, sender, Toast.LENGTH_SHORT).show();
+//
+//                                    if (msgClassifier.isUrgent(messageText, null, null)) {
+//                                        sendNotification(messageText);
+//                                    }
+//                                    else {
+//                                        if(sharedPrefs.getAutoReplyState(getApplication())){
+//                                            Toast.makeText(MainActivity.this, "indside getAuto", Toast.LENGTH_SHORT).show();
+//                                            //Intent intent = new Intent(MainActivity.this,MainActivity.class);
+////                                            intent.putExtra("isReceived","true");
+////                                            startActivity(intent);
+//
+//                                            sendSMS(sender,messageText);
+//                                            //SmsManager smsManager = SmsManager.getDefault();
+//                                            //smsManager.sendTextMessage(sender,null,messageText,null,null);
+//
+//                                        }
+//
+//
+//                                    }
+//                                }
+//                            });
 
                         }
 
@@ -161,7 +182,94 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         });
 
+        //BroadcastReceiver mReceiver = new SmsReceiver();
+        if(sharedPrefs.getSwitchState(this)){
+
+//            IntentFilter filter = new IntentFilter();
+//            filter.addAction("android.provider.Telephony.SMS_RECEIVED");
+//            getApplicationContext().registerReceiver(mReceiver, filter);
+            //sendSMS(this,"+972509011123","hey yael");
+
+//            SmsReceiver.bindListener(this);
+            SmsReceiver.bindListener(this);
+            Toast.makeText(this, "listening", Toast.LENGTH_SHORT).show();
+
+        }
+
+
+        if(sharedPrefs.getTimerState(this)){
+            //startAlarm();
+
+        }
     } //end of onCreate
+
+
+    @Override
+    public void messageReceived(String messageText, String sender) {
+//        if (msgClassifier.isUrgent(messageText, null, null)) {
+//            sendNotification(messageText);
+//        }
+//        else{
+            Toast.makeText(getBaseContext(), "sending the message", Toast.LENGTH_SHORT).show();
+            Log.d("ans","sending");
+            Toast.makeText(this, sender, Toast.LENGTH_SHORT).show();
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(sender, null, messageText, null, null);
+
+//        }
+
+    }
+
+    private void startAlarm(){
+        ArrayList<Date> dates = sharedPrefs.getTimerList(this);
+        int item_num = 0;
+        for(Date date : dates){
+            if(date.getIsOn()){
+                Calendar c = Calendar.getInstance();
+                c.set(Calendar.DAY_OF_MONTH,date.getDayOfMonth());
+                c.set(Calendar.MONTH,date.getMonth());
+                c.set(Calendar.YEAR,date.getYear());
+                c.set(Calendar.HOUR_OF_DAY,date.getHour());
+                c.set(Calendar.MINUTE,date.getMinute());
+                c.set(Calendar.SECOND,0);
+
+                AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                Intent intent = new Intent(this, AlertReceiver.class);
+                intent.putExtra("item_num",item_num);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this,item_num,intent,0);
+
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP,c.getTimeInMillis(),pendingIntent);
+            }
+            item_num++;
+        }
+    }
+
+    private void cancelAlarm(){
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,1,intent,0);
+
+        alarmManager.cancel(pendingIntent);
+    }
+
+
+    public void sendSMS(String phoneNo, String msg) {
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phoneNo, null, msg, null, null);
+            Toast.makeText(this, "Message Sent",
+                    Toast.LENGTH_LONG).show();
+        } catch (Exception ex) {
+            Toast.makeText(this,ex.getMessage().toString(),
+                    Toast.LENGTH_LONG).show();
+            ex.printStackTrace();
+        }
+    }
+
+//    public void sendSms(String number, String msg){
+//        android.telephony.SmsManager smsManager = SmsManager.getDefault();
+//        smsManager.sendTextMessage(number,null,msg,null,null);
+//    }
 
 
 
@@ -188,8 +296,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -297,16 +403,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void requestReadSMSPermission(){
+    private void requestSMSPermission(){
         enable_switch.setChecked(false);
         sharedPrefs.setSwitchState(false,this);
-        if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_SMS)){
+        if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SEND_SMS)){
             new AlertDialog.Builder(this)
                     .setTitle("Permission needed").setMessage("This permission is needed in order to send automatic reply")
                     .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_SMS},READ_SMS_PERMISSION_CODE);
+                            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.SEND_SMS},READ_SMS_PERMISSION_CODE);
                         }
                     })
                     .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -318,7 +424,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
         else{
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_SMS},READ_SMS_PERMISSION_CODE);
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.SEND_SMS},READ_SMS_PERMISSION_CODE);
         }
 
     }
@@ -386,5 +492,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             });
         }
     }
+
+
 
 }

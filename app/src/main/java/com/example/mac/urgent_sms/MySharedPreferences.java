@@ -33,19 +33,14 @@ public class MySharedPreferences {
     public void setSwitchState(boolean state, Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor  = prefs.edit();
-        editor.putString("switch state",""+state);
+        editor.putBoolean("switch state",state);
         editor.apply();
     }
 
     public boolean getSwitchState(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String state = prefs.getString("switch state",null);
-        if(state.equals("true")){
-            return true;
-        }
-        else{
-            return false;
-        }
+        boolean state = prefs.getBoolean("switch state",false);
+        return state;
     }
 
 
@@ -100,7 +95,7 @@ public class MySharedPreferences {
     public void setContactsState(boolean enable, Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor  = prefs.edit();
-        editor.putString("prefs_enable_contacts",""+enable);
+        editor.putBoolean("prefs_enable_contacts",enable);
         editor.apply();
     }
 
@@ -113,7 +108,7 @@ public class MySharedPreferences {
     public void setWordsState(boolean enable, Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor  = prefs.edit();
-        editor.putString("prefs_enable_words",""+enable);
+        editor.putBoolean("prefs_enable_words",enable);
         editor.apply();
     }
 
@@ -126,7 +121,7 @@ public class MySharedPreferences {
     public void setAutoReplyState(boolean enable, Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor  = prefs.edit();
-        editor.putString("prefs_enable_auto_reply",""+enable);
+        editor.putBoolean("prefs_enable_auto_reply",enable);
         editor.apply();
     }
 
@@ -248,7 +243,18 @@ public class MySharedPreferences {
     }
 
 
+    public void setIsMsgReceived(boolean state, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor  = prefs.edit();
+        editor.putBoolean("isMsgReceieved",state);
+        editor.apply();
+    }
 
+    public boolean getIsMsgReceieved(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean state = prefs.getBoolean("isMsgReceieved",false);
+        return state;
+    }
 
 
 }

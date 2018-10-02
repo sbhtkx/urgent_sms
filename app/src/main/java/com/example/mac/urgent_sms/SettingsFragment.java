@@ -5,6 +5,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
@@ -50,7 +51,8 @@ public class SettingsFragment extends PreferenceFragment{
         enable_contacts.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED){
+                if(ContextCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED){
                     enable_contacts.setChecked(false);
                     requestContactsPermission();
                 }
