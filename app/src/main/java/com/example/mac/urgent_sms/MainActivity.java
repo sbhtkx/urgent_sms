@@ -108,16 +108,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         logout_btn= (Button) findViewById(R.id.logout_btn);
         settings = (Button) findViewById(R.id.settings_btn);
         logout_btn.setOnClickListener(this);
-        welcome.setOnClickListener(this);
         settings.setOnClickListener(this);
 
         DataManager dm = DataManager.getInstance(getApplication());
         msgClassifier = MsgClassifier.getInstance(WordsManager.getInstance(dm),dm,getApplication());
 
+        SmsReceiver.bindListener(this);
         requestDoNotDisturbPermission();
-        //sendSMS(this,"+972542502484","hey yael");
-
-
+        final SmsReceiver smsReceiver = new SmsReceiver();
 
 
         //set main switch
@@ -127,47 +125,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
                 if(isChecked){
                     sharedPrefs.setSwitchState(true,getApplication());
-                    if(sharedPrefs.getHasDoNotDisturbPerm(getApplication())) {
-                        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
+                    NotificationManager notificationManager =
+                            (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && notificationManager.isNotificationPolicyAccessGranted()){
+                        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED){
                             requestSMSPermission();
                         }
                         else{ //permission granted
+
+                            //register receiver
+                            IntentFilter filter = new IntentFilter();
+                            filter.addAction("android.provider.Telephony.SMS_RECEIVED");
+                            registerReceiver(smsReceiver,filter);
 
                             Toast.makeText(MainActivity.this, "else", Toast.LENGTH_SHORT).show();
                             formerMode = audioManager.getRingerMode();
                             audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 
-
-//                            SmsReceiver.bindListener(new SmsListener() {
-//                                @Override
-//                                public void messageReceived(String messageText, String sender) {
-//                                    Toast.makeText(MainActivity.this, sender, Toast.LENGTH_SHORT).show();
-//
-//                                    if (msgClassifier.isUrgent(messageText, null, null)) {
-//                                        sendNotification(messageText);
-//                                    }
-//                                    else {
-//                                        if(sharedPrefs.getAutoReplyState(getApplication())){
-//                                            Toast.makeText(MainActivity.this, "indside getAuto", Toast.LENGTH_SHORT).show();
-//                                            //Intent intent = new Intent(MainActivity.this,MainActivity.class);
-////                                            intent.putExtra("isReceived","true");
-////                                            startActivity(intent);
-//
-//                                            sendSMS(sender,messageText);
-//                                            //SmsManager smsManager = SmsManager.getDefault();
-//                                            //smsManager.sendTextMessage(sender,null,messageText,null,null);
-//
-//                                        }
-//
-//
-//                                    }
-//                                }
-//                            });
-
                         }
 
                     }
-                    else{
+                    else{ //do not have permission
                         requestDoNotDisturbPermission();
                         enable_switch.setChecked(false);
                         sharedPrefs.setSwitchState(false,getApplication());
@@ -176,100 +154,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 else{ //!isChecked
                     sharedPrefs.setSwitchState(false,getApplication());
                     audioManager.setRingerMode(formerMode);
+                    unregisterReceiver(smsReceiver);
                 }
 
             }
 
         });
 
-        //BroadcastReceiver mReceiver = new SmsReceiver();
-        if(sharedPrefs.getSwitchState(this)){
-
-//            IntentFilter filter = new IntentFilter();
-//            filter.addAction("android.provider.Telephony.SMS_RECEIVED");
-//            getApplicationContext().registerReceiver(mReceiver, filter);
-            //sendSMS(this,"+972509011123","hey yael");
-
-//            SmsReceiver.bindListener(this);
-            SmsReceiver.bindListener(this);
-            Toast.makeText(this, "listening", Toast.LENGTH_SHORT).show();
-
-        }
-
-
-        if(sharedPrefs.getTimerState(this)){
-            //startAlarm();
-
-        }
     } //end of onCreate
 
 
     @Override
     public void messageReceived(String messageText, String sender) {
-//        if (msgClassifier.isUrgent(messageText, null, null)) {
-//            sendNotification(messageText);
-//        }
-//        else{
-            Toast.makeText(getBaseContext(), "sending the message", Toast.LENGTH_SHORT).show();
-            Log.d("ans","sending");
-            Toast.makeText(this, sender, Toast.LENGTH_SHORT).show();
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(sender, null, messageText, null, null);
-
-//        }
-
-    }
-
-    private void startAlarm(){
-        ArrayList<Date> dates = sharedPrefs.getTimerList(this);
-        int item_num = 0;
-        for(Date date : dates){
-            if(date.getIsOn()){
-                Calendar c = Calendar.getInstance();
-                c.set(Calendar.DAY_OF_MONTH,date.getDayOfMonth());
-                c.set(Calendar.MONTH,date.getMonth());
-                c.set(Calendar.YEAR,date.getYear());
-                c.set(Calendar.HOUR_OF_DAY,date.getHour());
-                c.set(Calendar.MINUTE,date.getMinute());
-                c.set(Calendar.SECOND,0);
-
-                AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-                Intent intent = new Intent(this, AlertReceiver.class);
-                intent.putExtra("item_num",item_num);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(this,item_num,intent,0);
-
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP,c.getTimeInMillis(),pendingIntent);
+        ArrayList<Contact> contacts = null;
+        ArrayList<Word> words = null;
+        if(sharedPrefs.getContactsState(this)){
+            contacts = sharedPrefs.getContactList(this);
+        }
+        if(sharedPrefs.getWordsState(this)){
+            words = sharedPrefs.getUrgentWordsList(this);
+        }
+        if (msgClassifier.isUrgent(messageText, contacts, words)) {
+            sendNotification(messageText);
+        }
+        else{ //msg is not urgent
+            if(sharedPrefs.getAutoReplyState(this)){
+                Toast.makeText(getBaseContext(), "sending the message", Toast.LENGTH_SHORT).show();
+                SmsManager smsManager = SmsManager.getDefault();
+                smsManager.sendTextMessage(sender, null, sharedPrefs.getAutoReply(this), null, null);
             }
-            item_num++;
+
+
         }
+
     }
-
-    private void cancelAlarm(){
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, AlertReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,1,intent,0);
-
-        alarmManager.cancel(pendingIntent);
-    }
-
-
-    public void sendSMS(String phoneNo, String msg) {
-        try {
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phoneNo, null, msg, null, null);
-            Toast.makeText(this, "Message Sent",
-                    Toast.LENGTH_LONG).show();
-        } catch (Exception ex) {
-            Toast.makeText(this,ex.getMessage().toString(),
-                    Toast.LENGTH_LONG).show();
-            ex.printStackTrace();
-        }
-    }
-
-//    public void sendSms(String number, String msg){
-//        android.telephony.SmsManager smsManager = SmsManager.getDefault();
-//        smsManager.sendTextMessage(number,null,msg,null,null);
-//    }
 
 
 
@@ -277,9 +195,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onBackPressed(){
         if(drawer.isDrawerOpen(GravityCompat.START)){
             drawer.closeDrawer(GravityCompat.START);
-        }
-        else{
-            //super.onBackPressed();
         }
     }
 
@@ -363,12 +278,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 break;
 
-            case (R.id.welcome_txt):
-                Intent myAccount_intent = new Intent("com.example.mac.urgent_sms.MyAccountActivity");
-                startActivity(myAccount_intent);
-                break;
-
-
 
         }
     }
@@ -406,13 +315,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void requestSMSPermission(){
         enable_switch.setChecked(false);
         sharedPrefs.setSwitchState(false,this);
-        if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SEND_SMS)){
+        if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECEIVE_SMS)){
             new AlertDialog.Builder(this)
                     .setTitle("Permission needed").setMessage("This permission is needed in order to send automatic reply")
                     .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.SEND_SMS},READ_SMS_PERMISSION_CODE);
+                            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.RECEIVE_SMS},READ_SMS_PERMISSION_CODE);
                         }
                     })
                     .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -424,10 +333,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
         else{
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.SEND_SMS},READ_SMS_PERMISSION_CODE);
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.RECEIVE_SMS},READ_SMS_PERMISSION_CODE);
         }
 
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -442,6 +352,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         }
+
     }
 
 

@@ -31,6 +31,7 @@ public class SettingsFragment extends PreferenceFragment{
     private static final int CONTACTS_PERMISSION_CODE = 123;
     private static final int SEND_SMS_PERMISSION_CODE = 456;
     public static CheckBoxPreference enable_contacts;
+    public static CheckBoxPreference enable_automatic_reply;
     private MySharedPreferences sharedPrefs = MySharedPreferences.getInstance();
 
     @Override
@@ -43,7 +44,7 @@ public class SettingsFragment extends PreferenceFragment{
         enable_contacts = (CheckBoxPreference) findPreference("prefs_enable_contacts");
         Preference urg_contacts_pref = (Preference) findPreference("prefs_urgent_contacts");
         Preference urg_words_pref = (Preference) findPreference("prefs_urgent_words");
-        CheckBoxPreference enable_automatic_reply = (CheckBoxPreference) findPreference("prefs_enable_auto_reply");
+        enable_automatic_reply = (CheckBoxPreference) findPreference("prefs_enable_auto_reply");
         Preference automatic_reply_pref = (Preference) findPreference("prefs_auto_reply");
         RingtonePreference notification_sound = (RingtonePreference) findPreference("prefs_notification_sound");
 
@@ -65,6 +66,7 @@ public class SettingsFragment extends PreferenceFragment{
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
+                    requestSMSPermission();
                     if(sharedPrefs.getAutoReply(getActivity()) == null){
                         sharedPrefs.setAutoReply(getResources().getString(R.string.automatic_reply_1),getActivity());
 
@@ -132,6 +134,33 @@ public class SettingsFragment extends PreferenceFragment{
         }
         else{
             ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.READ_CONTACTS},CONTACTS_PERMISSION_CODE);
+        }
+
+    }
+
+
+    private void requestSMSPermission(){
+        if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.SEND_SMS)){
+            new AlertDialog.Builder(getActivity())
+                    .setTitle("Permission needed").setMessage("This permission is needed in order to send automatic reply")
+                    .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            enable_automatic_reply.setChecked(false);
+                            ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_CODE);
+                        }
+                    })
+                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            enable_automatic_reply.setChecked(false);
+                            dialogInterface.dismiss();
+
+                        }
+                    }).create().show();
+        }
+        else{
+            ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_CODE);
         }
 
     }

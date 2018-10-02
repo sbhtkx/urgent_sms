@@ -50,5 +50,17 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
 
+        else{
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                SettingsFragment.enable_automatic_reply.setChecked(true);
+
+            }
+            else{
+                SettingsFragment.enable_automatic_reply.setChecked(false);
+
+
+            }
+        }
+
     }
 }

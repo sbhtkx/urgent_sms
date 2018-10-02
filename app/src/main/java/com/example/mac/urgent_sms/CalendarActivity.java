@@ -210,18 +210,9 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
 
 
     private void startAlarm(Date date){
-//        Calendar c = Calendar.getInstance();
-//        c.set(Calendar.DAY_OF_MONTH,date.getDayOfMonth());
-//        c.set(Calendar.MONTH,date.getMonth());
-//        c.set(Calendar.YEAR,date.getYear());
-//        c.set(Calendar.HOUR_OF_DAY,date.getHour());
-//        c.set(Calendar.MINUTE,date.getMinute());
-//        c.set(Calendar.SECOND,0);
-
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlertReceiver.class);
-//        intent.putExtra("id",date.getId());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this,date.getId(),intent,0);
 
         alarmManager.setExact(AlarmManager.RTC_WAKEUP,date.getCalendar().getTimeInMillis(),pendingIntent);
