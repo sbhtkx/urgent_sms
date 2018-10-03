@@ -180,13 +180,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 SmsManager smsManager = SmsManager.getDefault();
                 smsManager.sendTextMessage(sender, null, sharedPrefs.getAutoReply(this), null, null);
             }
-
-
         }
 
     }
-
-
 
     @Override
     public void onBackPressed(){
@@ -199,13 +195,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onStart() {
         super.onStart();
 
-        if(sharedPrefs.getSwitchState(this)){
+        if( (sharedPrefs.getSwitchState(this)) || (sharedPrefs.getHasTimerEnableApp(this)) ){
             enable_switch.setChecked(true);
+            if(sharedPrefs.getHasTimerEnableApp(this)){
+                moveTaskToBack(true);
+                sharedPrefs.setHasTimerEnableApp(false,this);
+
+            }
         }
         else{
             enable_switch.setChecked(false);
-        }
 
+        }
 
     }
 

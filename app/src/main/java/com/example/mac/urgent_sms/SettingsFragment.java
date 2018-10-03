@@ -2,6 +2,9 @@ package com.example.mac.urgent_sms;
 
 import android.*;
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -21,6 +24,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by Mac on 16/09/2018.
@@ -47,6 +51,7 @@ public class SettingsFragment extends PreferenceFragment{
         enable_automatic_reply = (CheckBoxPreference) findPreference("prefs_enable_auto_reply");
         Preference automatic_reply_pref = (Preference) findPreference("prefs_auto_reply");
         RingtonePreference notification_sound = (RingtonePreference) findPreference("prefs_notification_sound");
+        final CheckBoxPreference enable_alarm = (CheckBoxPreference) findPreference("prefs_enable_timer");
 
 
         enable_contacts.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -112,6 +117,20 @@ public class SettingsFragment extends PreferenceFragment{
             }
         });
 
+
+        enable_alarm.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if(enable_alarm.isChecked()){
+                    startAlarms();
+                }
+                else{
+                    cancelAlarms();
+                }
+                return true;
+            }
+        });
+
     }
 
     private void requestContactsPermission(){
@@ -164,6 +183,49 @@ public class SettingsFragment extends PreferenceFragment{
         }
 
     }
+
+    private void cancelAlarms(){
+        ArrayList<Date> dates = sharedPrefs.getTimerList(getActivity());
+        for(Date date : dates){
+            AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(getActivity(), AlertReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(),date.getId(),intent,0);
+            alarmManager.cancel(pendingIntent);
+
+        }
+    }
+
+    private void startAlarms(){
+        ArrayList<Date> dates = sharedPrefs.getTimerList(getActivity());
+        for(Date date : dates){
+            if(!isSoonerThanToday(date.getCalendar())){
+                AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+                Intent intent = new Intent(getActivity(), AlertReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(),date.getId(),intent,0);
+
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP,date.getCalendar().getTimeInMillis(),pendingIntent);
+            }
+
+
+        }
+
+    }
+
+    private boolean isSoonerThanToday(Calendar c){
+        Calendar calendar_now = Calendar.getInstance();
+        calendar_now.set(Calendar.SECOND,0);
+
+        if (calendar_now.getTime().after(c.getTime())) {
+            return true;
+        }
+        else{
+            return false;
+        }
+
+
+    }
+
+
 
 
 }

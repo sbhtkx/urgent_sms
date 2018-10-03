@@ -1,10 +1,14 @@
 package com.example.mac.urgent_sms;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Mac on 01/10/2018.
@@ -15,20 +19,30 @@ public class AlertReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        boolean former_state = sharedPrefs.getSwitchState(context);
-        MainActivity.enable_switch.setChecked(true);
-        sharedPrefs.setSwitchState(true,context);
 
-        //remove timer from timer_list
-//        int id = intent.getExtras().getInt("id");
-//        ArrayList<Date> dates = sharedPrefs.getTimerList(context);
-//        for(Date date : dates){
-//            if(date.getId() == id){
-//                dates.remove(date);
-//            }
-//        }
-//        sharedPrefs.setTimerList(dates,context);
+        if (isRunning(context)) {
+            //app is running
+        }
+        else {
 
-        //cancel the alarm
+            Intent i = context.getPackageManager().getLaunchIntentForPackage("com.example.mac.urgent_sms");
+            context.startActivity(i);
+
+        }
+        sharedPrefs.setHasTimerEnableApp(true,context);
+
+    }
+
+
+    public static boolean isRunning(Context ctx) {
+        ActivityManager activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
+
+        List<ActivityManager.RunningTaskInfo> tasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
+
+        for (ActivityManager.RunningTaskInfo task : tasks) {
+            if (ctx.getPackageName().equalsIgnoreCase(task.baseActivity.getPackageName()))
+                return true;
+        }
+        return false;
     }
 }

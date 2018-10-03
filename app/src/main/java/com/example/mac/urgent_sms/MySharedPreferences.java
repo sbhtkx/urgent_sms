@@ -242,19 +242,19 @@ public class MySharedPreferences {
         }
     }
 
-
-    public void setIsMsgReceived(boolean state, Context context) {
+    public void setHasTimerEnableApp(boolean hasPerm, Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor  = prefs.edit();
-        editor.putBoolean("isMsgReceieved",state);
+        editor.putBoolean("has app restarted",hasPerm);
         editor.apply();
     }
 
-    public boolean getIsMsgReceieved(Context context) {
+    public boolean getHasTimerEnableApp(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean state = prefs.getBoolean("isMsgReceieved",false);
+        boolean state = prefs.getBoolean("has app restarted",false);
         return state;
     }
+
 
 
 }
