@@ -37,8 +37,9 @@ public class WordsManager {
     }
 
     public int[] stringToVector(String str){
-        str = str.toLowerCase();
         updateVoc();
+
+        str = str.replaceAll("[^A-Za-z0-9]","").toLowerCase();
         int[] vector = new int[voc.length];
         Set<String> words = new HashSet<>();
         stk = new StringTokenizer(str);

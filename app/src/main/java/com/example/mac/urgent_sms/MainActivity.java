@@ -1,10 +1,8 @@
 package com.example.mac.urgent_sms;
 
 import android.Manifest;
-import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,13 +10,14 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.provider.Telephony;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -30,7 +29,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -50,7 +48,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,
         NavigationView.OnNavigationItemSelectedListener, SmsListener{
@@ -66,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MsgClassifier msgClassifier;
     NotificationCompat.Builder notification;  // daniel
     private static final int uniqueID = 452345245;  // the system needs it to manage notifications
-    int formerMode =0;  // the ringer mode to back to on completion of ringtone, need to be a field because i don't know other way to send it to onCompletion()
+    int formerMode;  // the ringer mode to back to on completion of ringtone, need to be a field because i don't know other way to send it to onCompletion()
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -378,11 +375,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // play ringtone
         MySharedPreferences mySharedPreferences = MySharedPreferences.getInstance();
         if(mySharedPreferences.getRingtoneState(this)) {
+            final Uri formerRingtone = Settings.System.DEFAULT_RINGTONE_URI;
             String path = mySharedPreferences.getRingtoneLocation(this);
             Uri uri = Uri.parse(path);
-            MediaPlayer mp = MediaPlayer.create(getApplication(), uri);
+            MediaPlayer mp = MediaPlayer.create(getApplication(), R.raw.five_seconds_of_silence);
             final AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-            audioManager.setRingerMode(formerMode);
+            audioManager.setRingerMode(AudioManager.MODE_NORMAL);
+            RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_NOTIFICATION, uri);
             mp.start();
             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
@@ -398,6 +397,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         v.vibrate(500);
                     }
                     audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                    RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_NOTIFICATION, formerRingtone);
                 }
 
             });
