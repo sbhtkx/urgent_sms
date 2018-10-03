@@ -175,6 +175,8 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
                 dates.get(itemToEdit).setDay(day_of_monthFinal);
                 dates.get(itemToEdit).setHour(hourFinal);
                 dates.get(itemToEdit).setMinute(minuteFinal);
+                cancelAlarm(dates.get(itemToEdit).getId());
+                startAlarm(dates.get(itemToEdit));
                 isEdit = false;
             }
             listView_alarms.setAdapter(customAdapter);
@@ -187,15 +189,16 @@ public class CalendarActivity extends AppCompatActivity implements View.OnClickL
 
     private boolean isSoonerThanToday(Calendar c){
         Calendar calendar_now = Calendar.getInstance();
-        Calendar calendar = Calendar.getInstance();
+        calendar_now.set(Calendar.SECOND,0);
+//        Calendar calendar = Calendar.getInstance();
 
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        calendar.set(Calendar.YEAR,year);
-        calendar.set(Calendar.MONTH,month);
-        calendar.set(Calendar.DAY_OF_MONTH,day);
+//        int year = calendar.get(Calendar.YEAR);
+//        int month = calendar.get(Calendar.MONTH);
+//        int day = calendar.get(Calendar.DAY_OF_MONTH);
+//
+//        calendar.set(Calendar.YEAR,year);
+//        calendar.set(Calendar.MONTH,month);
+//        calendar.set(Calendar.DAY_OF_MONTH,day);
 
 
         if (calendar_now.getTime().after(c.getTime())) {

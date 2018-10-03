@@ -10,7 +10,7 @@ public class Word {
     private int urgency_level;
 
     public Word(String word, int urgency_level){
-        this.word = word;
+        this.word = word.toLowerCase();
         this.urgency_level = urgency_level;
     }
 

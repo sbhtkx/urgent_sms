@@ -57,6 +57,9 @@ public class MsgClassifier {
         updateWeights();
         double y = 1 / (1 + Math.exp(-z2));
 
+        String msg_lower = msg.toLowerCase();
+
+
         Log.d("msgc1",Double.toString(y));
 
         Toast.makeText(ctx, msg+": "+Double.toString(y), Toast.LENGTH_LONG).show();

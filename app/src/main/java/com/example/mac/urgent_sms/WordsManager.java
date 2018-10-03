@@ -26,7 +26,7 @@ public class WordsManager {
     }
 
     private void updateVoc(){
-        if (voc==null) {
+        if (voc == null) {
             try {
                 voc = dm.loadStringArrayFromInternalStorage("vocabulary.data");
             } catch (Exception e) {
