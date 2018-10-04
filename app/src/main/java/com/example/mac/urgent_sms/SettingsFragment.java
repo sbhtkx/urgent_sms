@@ -8,12 +8,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.RingtonePreference;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -25,6 +28,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
  * Created by Mac on 16/09/2018.
@@ -50,7 +55,7 @@ public class SettingsFragment extends PreferenceFragment{
         Preference urg_words_pref = (Preference) findPreference("prefs_urgent_words");
         enable_automatic_reply = (CheckBoxPreference) findPreference("prefs_enable_auto_reply");
         Preference automatic_reply_pref = (Preference) findPreference("prefs_auto_reply");
-        RingtonePreference notification_sound = (RingtonePreference) findPreference("prefs_notification_sound");
+        final RingtonePreference notification_sound = (RingtonePreference) findPreference("prefs_notification_sound");
         final CheckBoxPreference enable_alarm = (CheckBoxPreference) findPreference("prefs_enable_timer");
 
 
@@ -130,6 +135,7 @@ public class SettingsFragment extends PreferenceFragment{
                 return true;
             }
         });
+
 
     }
 
@@ -223,6 +229,17 @@ public class SettingsFragment extends PreferenceFragment{
         }
 
 
+    }
+
+    private void requestSettingPermission() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.System.canWrite(getApplicationContext())) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + getActivity().getPackageName()));
+                startActivityForResult(intent, 200);
+
+            }
+        }
     }
 
 

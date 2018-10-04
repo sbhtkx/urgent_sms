@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by Mac on 17/09/2018.
@@ -224,23 +225,6 @@ public class MySharedPreferences {
         return location;
     }
 
-    public void setHasDoNotDisturbPerm(boolean hasPerm, Context context){
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor  = prefs.edit();
-        editor.putString("DO NOT DISTURB perm",""+hasPerm);
-        editor.apply();
-    }
-
-    public boolean getHasDoNotDisturbPerm(Context context){
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String state = prefs.getString("DO NOT DISTURB perm",null);
-        if(state.equals("true")){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
 
     public void setHasTimerEnableApp(boolean hasPerm, Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -253,6 +237,28 @@ public class MySharedPreferences {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         boolean state = prefs.getBoolean("has app restarted",false);
         return state;
+    }
+
+    public void setPriorMsgTime(Calendar calendar, Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor  = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(calendar);
+        editor.putString("prior msg time",json);
+        editor.apply();
+    }
+
+    public Calendar getPriorMsgTime(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Gson gson = new Gson();
+        String json = prefs.getString("prior msg time",null);
+        Type type = new TypeToken<Calendar>(){}.getType();
+        return gson.fromJson(json, type);
+
+
+
+
+
     }
 
 

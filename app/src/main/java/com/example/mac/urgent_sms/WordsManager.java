@@ -2,7 +2,9 @@ package com.example.mac.urgent_sms;
 
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -39,7 +41,7 @@ public class WordsManager {
     public int[] stringToVector(String str){
         updateVoc();
 
-        str = str.replaceAll("[^A-Za-z0-9]","").toLowerCase();
+        str = str.replaceAll("[^A-Za-z0-9]"," ").toLowerCase();
         int[] vector = new int[voc.length];
         Set<String> words = new HashSet<>();
         stk = new StringTokenizer(str);
@@ -56,5 +58,16 @@ public class WordsManager {
             }
         }
         return vector;
+    }
+
+    public ArrayList<String> stringToArray(String msg){
+        msg = msg.replaceAll("[^A-Za-z0-9]"," ").toLowerCase();
+        ArrayList<String> words = new ArrayList<String>();
+        stk = new StringTokenizer(msg);
+        while(stk.hasMoreElements()){
+            String s = stk.nextToken();
+            words.add(s);
+        }
+        return words;
     }
 }

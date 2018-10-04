@@ -29,6 +29,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -48,6 +49,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,
         NavigationView.OnNavigationItemSelectedListener, SmsListener{
@@ -143,13 +145,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             // change ringtone
                             if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(MainActivity.this))) {
                                 uriFormerRingtone = Settings.System.DEFAULT_RINGTONE_URI;
-                                String pathNewRingtone = "content://media/internal/audio/media/97";//mySharedPreferences.getRingtoneLocation(this);
+                                String pathNewRingtone = sharedPrefs.getRingtoneLocation(MainActivity.this);
                                 Uri uriNewRingtone = Uri.parse(pathNewRingtone);
                                 RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_NOTIFICATION, uriNewRingtone);
                             }
-
                         }
-
                     }
                     else{ //do not have permission
                         requestDoNotDisturbPermission();
@@ -165,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     sharedPrefs.setSwitchState(false,getApplication());
                     audioManager.setRingerMode(formerMode);
                     unregisterReceiver(smsReceiver);
+                    RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this,RingtoneManager.TYPE_NOTIFICATION, uriFormerRingtone);
                 }
 
             }
@@ -188,14 +189,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             sendNotification(messageText);
         }
         else{ //msg is not urgent
-            if(sharedPrefs.getAutoReplyState(this)){
+            sendMsg(sender);
+        }
+
+    }
+
+    private void sendMsg(String sender){
+        if(sharedPrefs.getAutoReplyState(this)){
+            Calendar prior_msg_time = sharedPrefs.getPriorMsgTime(this);
+            sharedPrefs.setPriorMsgTime(Calendar.getInstance(),this);
+            Calendar msg_now = Calendar.getInstance();
+            if(prior_msg_time != null){
+                long dif_sec = (msg_now.getTimeInMillis() - prior_msg_time.getTimeInMillis()) / 1000;
+                if(dif_sec >= 10){
+                    Toast.makeText(getBaseContext(), "sending the message", Toast.LENGTH_SHORT).show();
+                    SmsManager smsManager = SmsManager.getDefault();
+                    smsManager.sendTextMessage(sender, null, sharedPrefs.getAutoReply(this), null, null);
+                }
+            }
+
+            else{
                 Toast.makeText(getBaseContext(), "sending the message", Toast.LENGTH_SHORT).show();
                 SmsManager smsManager = SmsManager.getDefault();
                 smsManager.sendTextMessage(sender, null, sharedPrefs.getAutoReply(this), null, null);
             }
-        }
 
+
+        }
     }
+
+
+
+
 
     @Override
     public void onBackPressed(){
@@ -297,7 +322,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         NotificationManager notificationManager =
                 (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !notificationManager.isNotificationPolicyAccessGranted()) {
-            sharedPrefs.setHasDoNotDisturbPerm(false,this);
             Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
             startActivityForResult(intent,DO_NOT_DISTURB_CODE);
             onBackPressed();
@@ -316,7 +340,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
             else{
-                sharedPrefs.setHasDoNotDisturbPerm(true,this);
                 Toast.makeText(this, "Do not disturb Permission GRANTED", Toast.LENGTH_SHORT).show();
             }
 
@@ -378,6 +401,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         notificationBuilder.setContentText(msg);
         notificationBuilder.setSound(Uri.parse("android.resource://"+getPackageName()+"/raw/five_seconds_of_silence.mp3"));
 
+        notificationBuilder.setSound(Uri.parse(sharedPrefs.getRingtoneLocation(MainActivity.this)));
+
         // build what will happen when user press on the notification
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -390,13 +415,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // play ringtone
         MySharedPreferences mySharedPreferences = MySharedPreferences.getInstance();
         if(mySharedPreferences.getRingtoneState(this)) {
+            Log.d("send1","ok");
 //            final Uri uriFormerRingtone = Settings.System.DEFAULT_RINGTONE_URI;
             String pathNewRingtone = mySharedPreferences.getRingtoneLocation(this);
             Uri uriNewRingtone = Uri.parse(pathNewRingtone);
             MediaPlayer mp = MediaPlayer.create(getApplication(), R.raw.five_seconds_of_silence);
             final AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-            audioManager.setRingerMode(AudioManager.MODE_NORMAL);
+            audioManager.setRingerMode(2);
+            Log.d("send1",Integer.toString(audioManager.getRingerMode()));
             RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_NOTIFICATION, uriNewRingtone);
+//            RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_ALARM, uriNewRingtone);
+//            RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_RINGTONE, uriNewRingtone);
+//            RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_ALL, uriNewRingtone);
             Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             // Vibrate for 500 milliseconds
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

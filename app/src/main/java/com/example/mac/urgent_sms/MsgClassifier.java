@@ -6,7 +6,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 
 public class MsgClassifier {
@@ -18,6 +20,16 @@ public class MsgClassifier {
     private double[][] b1;
     private double b2;
     private double threshold;
+
+    private final static double WORD_URG_LEVEL_1 = 0.1;
+    private final static double WORD_URG_LEVEL_2 = 0.3;
+    private final static double WORD_URG_LEVEL_3 = 0.5;
+
+    private final static double CONTACT_URG_LEVEL_1 = 0.1;
+    private final static double CONTACT_URG_LEVEL_2 = 0.3;
+    private final static double CONTACT_URG_LEVEL_3 = 0.5;
+    private final static double CONTACT_ALWAYS_URGENT = 1;
+
 
     private Context ctx;
 
@@ -57,14 +69,83 @@ public class MsgClassifier {
         updateWeights();
         double y = 1 / (1 + Math.exp(-z2));
 
-        String msg_lower = msg.toLowerCase();
+        double urgency_addition = 0;
+        if(words != null){
+            urgency_addition = urgency_addition + urgWordsAddition(wm.stringToArray(msg),words);
+        }
+        if(contacts != null){
+            urgency_addition = urgency_addition + urgContactsAddition(contacts);
+        }
 
+        y = y + urgency_addition; //decide how to calc this
 
         Log.d("msgc1",Double.toString(y));
 
         Toast.makeText(ctx, msg+": "+Double.toString(y), Toast.LENGTH_LONG).show();
 
         return y > threshold;
+    }
+
+    private double urgWordsAddition(ArrayList<String> msg_arr, ArrayList<Word> words){
+        double urg_add = 0;
+        for(int i=0; i<words.size(); i++){
+            for(int j=0; j<msg_arr.size(); j++){
+                if(words.get(i).getWord().equals(msg_arr.get(j))){
+                    switch(words.get(i).getUrgencyLevel()){
+                        case(1):
+                            urg_add = calcWordUrgLevel(urg_add,WORD_URG_LEVEL_1);
+                            break;
+
+                        case(2):
+                            urg_add = calcWordUrgLevel(urg_add,WORD_URG_LEVEL_2);
+                            break;
+
+                        case(3):
+                            urg_add = calcWordUrgLevel(urg_add,WORD_URG_LEVEL_3);
+                            break;
+
+                    }
+                    break; //TO CHECK!!!
+                }
+            }
+
+        }
+        return urg_add;
+    }
+
+    private double urgContactsAddition(ArrayList<Contact> contacts){
+        double urg_add = 0;
+        for(Contact contact : contacts){
+            switch(contact.getUrgencyLevel()){
+                case(1):
+                    urg_add = calcContactUrgLevel(urg_add,CONTACT_URG_LEVEL_1);
+                    break;
+
+                case(2):
+                    urg_add = calcContactUrgLevel(urg_add,CONTACT_URG_LEVEL_2);
+                    break;
+
+                case(3):
+                    urg_add = calcContactUrgLevel(urg_add,CONTACT_URG_LEVEL_3);
+                    break;
+
+                case(4):
+                    urg_add = calcContactUrgLevel(urg_add,CONTACT_ALWAYS_URGENT);
+                    break;
+
+            }
+        }
+        return urg_add;
+    }
+
+    private double calcWordUrgLevel(double sum, double level_addition){
+
+        return 0;
+    }
+
+    private double calcContactUrgLevel(double sum, double leve_addition){
+
+        return 0;
     }
 
 
