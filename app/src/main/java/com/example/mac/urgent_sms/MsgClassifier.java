@@ -30,6 +30,8 @@ public class MsgClassifier {
     private final static double CONTACT_URG_LEVEL_3 = 0.5;
     private final static double CONTACT_ALWAYS_URGENT = 1;
 
+    private static int turn = 0;
+
 
     private Context ctx;
 
@@ -77,7 +79,7 @@ public class MsgClassifier {
             urgency_addition = urgency_addition + urgContactsAddition(contacts);
         }
 
-        y = y + urgency_addition; //decide how to calc this
+        y = y + urgency_addition;
 
         Log.d("msgc1",Double.toString(y));
 
@@ -87,6 +89,7 @@ public class MsgClassifier {
     }
 
     private double urgWordsAddition(ArrayList<String> msg_arr, ArrayList<Word> words){
+        turn = 0;
         double urg_add = 0;
         for(int i=0; i<words.size(); i++){
             for(int j=0; j<msg_arr.size(); j++){
@@ -118,19 +121,19 @@ public class MsgClassifier {
         for(Contact contact : contacts){
             switch(contact.getUrgencyLevel()){
                 case(1):
-                    urg_add = calcContactUrgLevel(urg_add,CONTACT_URG_LEVEL_1);
+                    urg_add = CONTACT_URG_LEVEL_1;
                     break;
 
                 case(2):
-                    urg_add = calcContactUrgLevel(urg_add,CONTACT_URG_LEVEL_2);
+                    urg_add = CONTACT_URG_LEVEL_2;
                     break;
 
                 case(3):
-                    urg_add = calcContactUrgLevel(urg_add,CONTACT_URG_LEVEL_3);
+                    urg_add = CONTACT_URG_LEVEL_3;
                     break;
 
                 case(4):
-                    urg_add = calcContactUrgLevel(urg_add,CONTACT_ALWAYS_URGENT);
+                    urg_add = CONTACT_ALWAYS_URGENT;
                     break;
 
             }
@@ -139,14 +142,11 @@ public class MsgClassifier {
     }
 
     private double calcWordUrgLevel(double sum, double level_addition){
-
+        turn++;
+        sum = sum + (1/turn)*level_addition;
         return 0;
     }
 
-    private double calcContactUrgLevel(double sum, double leve_addition){
-
-        return 0;
-    }
 
 
     public static double[][] matMul(double[][] A, double[][] B){

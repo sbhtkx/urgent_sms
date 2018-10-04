@@ -221,7 +221,7 @@ public class MySharedPreferences {
 
     public String getRingtoneLocation(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String location = prefs.getString("prefs_notification_sound",null);
+        String location = prefs.getString("prefs_notification_sound","content://settings/system/notification_sound");
         return location;
     }
 
