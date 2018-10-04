@@ -255,10 +255,6 @@ public class MySharedPreferences {
         Type type = new TypeToken<Calendar>(){}.getType();
         return gson.fromJson(json, type);
 
-
-
-
-
     }
 
 

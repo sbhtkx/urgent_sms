@@ -105,7 +105,7 @@ public class MsgClassifier {
                             break;
 
                     }
-                    break; //TO CHECK!!!
+                    break; //TO CHECK!!! j = msg_arr.size()
                 }
             }
 

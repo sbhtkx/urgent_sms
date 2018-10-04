@@ -113,6 +113,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         DataManager dm = DataManager.getInstance(getApplication());
         msgClassifier = MsgClassifier.getInstance(WordsManager.getInstance(dm),dm,getApplication());
 
+        // Build the notification for received urgent sms
+        notificationBuilder = new NotificationCompat.Builder(this, "default"); // not sure about channel_id...
+        notificationBuilder.setAutoCancel(true);
+        notificationBuilder.setSmallIcon(R.drawable.alert);//
+        notificationBuilder.setTicker("Urgent message!");
+        notificationBuilder.setWhen(System.currentTimeMillis());
+        notificationBuilder.setContentTitle("Urgent message!");
+        notificationBuilder.setSound(Uri.parse("android.resource://" + getPackageName() + "/raw/five_seconds_of_silence.mp3"));
+//        notificationBuilder.setSound(Uri.parse(sharedPrefs.getRingtoneLocation(MainActivity.this)));
+
+        // build what will happen when user press on the notification
+        Intent intent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        notificationBuilder.setContentIntent(pendingIntent);
+
         SmsReceiver.bindListener(this);
         requestDoNotDisturbPermission();
         requestSettingPermission();
@@ -120,52 +135,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         //set main switch
-        enable_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+        enable_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
-            public void onCheckedChanged(CompoundButton button, boolean isChecked){
-                AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-                if(isChecked){
-                    sharedPrefs.setSwitchState(true,getApplication());
-                    NotificationManager notificationManager =
-                            (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && notificationManager.isNotificationPolicyAccessGranted()){
-                        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED){
+            public void onCheckedChanged(CompoundButton button, boolean isChecked) {
+                if (isChecked) {
+                    sharedPrefs.setSwitchState(true, getApplication());
+                    NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || notificationManager.isNotificationPolicyAccessGranted()) {
+                        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
                             requestSMSPermission();
-                        }
-                        else{ //permission granted
+                        } else { //permission granted
 
                             //register receiver
                             IntentFilter filter = new IntentFilter();
                             filter.addAction("android.provider.Telephony.SMS_RECEIVED");
-                            registerReceiver(smsReceiver,filter);
+                            registerReceiver(smsReceiver, filter);
 
                             Toast.makeText(MainActivity.this, "else", Toast.LENGTH_SHORT).show();
-                            formerMode = audioManager.getRingerMode();
-                            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                            // change ringtone
-                            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(MainActivity.this))) {
-                                uriFormerRingtone = Settings.System.DEFAULT_RINGTONE_URI;
-                                String pathNewRingtone = sharedPrefs.getRingtoneLocation(MainActivity.this);
-                                Uri uriNewRingtone = Uri.parse(pathNewRingtone);
-                                RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_NOTIFICATION, uriNewRingtone);
-                            }
+                            changeToSilentAndChangeRingtone();
                         }
-                    }
-                    else{ //do not have permission
+                    } else { //do not have permission
                         requestDoNotDisturbPermission();
                         enable_switch.setChecked(false);
-                        sharedPrefs.setSwitchState(false,getApplication());
-                        //change back the ringtone
-                        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(MainActivity.this))) {
-                            RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_NOTIFICATION, uriFormerRingtone);
-                        }
+                        sharedPrefs.setSwitchState(false, getApplication());
                     }
-                }
-                else{ //!isChecked
-                    sharedPrefs.setSwitchState(false,getApplication());
-                    audioManager.setRingerMode(formerMode);
+                } else { //!isChecked
                     unregisterReceiver(smsReceiver);
-                    RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this,RingtoneManager.TYPE_NOTIFICATION, uriFormerRingtone);
+                    sharedPrefs.setSwitchState(false, getApplication());
+                    changeBackRingerModeAndRingtone();
                 }
 
             }
@@ -391,22 +388,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-    private void sendNotification(String msg){
-
-        // Build the notification
-        notificationBuilder.setSmallIcon(R.drawable.alert);//
-        notificationBuilder.setTicker("Urgent message!");
-        notificationBuilder.setWhen(System.currentTimeMillis());
-        notificationBuilder.setContentTitle("Urgent message!");
+    private void sendNotification(String msg) {
         notificationBuilder.setContentText(msg);
-        notificationBuilder.setSound(Uri.parse("android.resource://"+getPackageName()+"/raw/five_seconds_of_silence.mp3"));
-
-        notificationBuilder.setSound(Uri.parse(sharedPrefs.getRingtoneLocation(MainActivity.this)));
-
-        // build what will happen when user press on the notification
-        Intent intent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        notificationBuilder.setContentIntent(pendingIntent);
 
         // Builds notification and issues it
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -414,38 +397,69 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // play ringtone
         MySharedPreferences mySharedPreferences = MySharedPreferences.getInstance();
-        if(mySharedPreferences.getRingtoneState(this)) {
-            Log.d("send1","ok");
-//            final Uri uriFormerRingtone = Settings.System.DEFAULT_RINGTONE_URI;
-            String pathNewRingtone = mySharedPreferences.getRingtoneLocation(this);
-            Uri uriNewRingtone = Uri.parse(pathNewRingtone);
-            MediaPlayer mp = MediaPlayer.create(getApplication(), R.raw.five_seconds_of_silence);
-            final AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-            audioManager.setRingerMode(2);
-            Log.d("send1",Integer.toString(audioManager.getRingerMode()));
-            RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_NOTIFICATION, uriNewRingtone);
-//            RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_ALARM, uriNewRingtone);
-//            RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_RINGTONE, uriNewRingtone);
-//            RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_ALL, uriNewRingtone);
-            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            // Vibrate for 500 milliseconds
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else {
-                //deprecated in API 26
-                v.vibrate(500);
-            }
-            mp.start();
-            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    mp.release();
-                    audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                    RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_NOTIFICATION, uriFormerRingtone);
+        if (mySharedPreferences.getRingtoneState(this)) {
+            Log.d("send1", "ok");
+            if (mySharedPreferences.getRingtoneState(this)) {
+                Log.d("send1", "ok");
+                String pathNewRingtone = mySharedPreferences.getRingtoneLocation(this);
+                Uri uriNewRingtone = Uri.parse(pathNewRingtone);
+                MediaPlayer mp = MediaPlayer.create(getApplication(), R.raw.five_seconds_of_silence);
+                final AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+                final NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || !notificationManager.isNotificationPolicyAccessGranted()) {
+                    audioManager.setRingerMode(2);
                 }
+                Log.d("send1", Integer.toString(audioManager.getRingerMode()));
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.System.canWrite(getApplicationContext())) {
+                    RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_NOTIFICATION, uriNewRingtone);
+//              RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_ALARM, uriNewRingtone);
+//              RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_RINGTONE, uriNewRingtone);
+//              RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_ALL, uriNewRingtone);
+                }
+                // Vibrate for 500 milliseconds
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else {
+                    //deprecated in API 26
+                    v.vibrate(500);
+                }
+                mp.start();
+                mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        mp.release();
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || !notificationManager.isNotificationPolicyAccessGranted()) {
+                            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                        }
+                    }
+                });
+            }
+        }
+    }
 
-            });
+
+    private void changeToSilentAndChangeRingtone() {
+        AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+        // change ringer mode
+        formerMode = audioManager.getRingerMode();
+        audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+        // change ringtone
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(MainActivity.this))) {
+            uriFormerRingtone = Settings.System.DEFAULT_RINGTONE_URI;
+            String pathNewRingtone = sharedPrefs.getRingtoneLocation(MainActivity.this);
+            Uri uriNewRingtone = Uri.parse(pathNewRingtone);
+            RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_NOTIFICATION, uriNewRingtone);
+        }
+    }
+
+    private void changeBackRingerModeAndRingtone() {
+        AudioManager audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+        // change back the ringer mode
+        audioManager.setRingerMode(formerMode);
+        // change back the ringtone
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(MainActivity.this))) {
+            RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_NOTIFICATION, uriFormerRingtone);
         }
     }
 
